@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import Navigation from './Navbar';
 import { Container } from 'reactstrap';
 
-import { BrowserRouter as Router, Redirect, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Routes, Route } from 'react-router-dom';
 import {
   AlertsPage,
   ConfigPage,
@@ -72,40 +72,22 @@ const App: FC<AppProps> = ({ consolesLink }) => {
         <Router basename={basePath}>
           <Navigation consolesLink={consolesLink} />
           <Container fluid style={{ paddingTop: 70 }}>
-            <Switch>
-              <Redirect exact from="/" to={`graph`} />
+            <Routes>
               {/*
               NOTE: Any route added here needs to also be added to the list of
               React-handled router paths ("reactRouterPaths") in /web/web.go.
             */}
-              <Route path="/graph">
-                <PanelListPage />
-              </Route>
-              <Route path="/alerts">
-                <AlertsPage />
-              </Route>
-              <Route path="/config">
-                <ConfigPage />
-              </Route>
-              <Route path="/flags">
-                <FlagsPage />
-              </Route>
-              <Route path="/rules">
-                <RulesPage />
-              </Route>
-              <Route path="/service-discovery">
-                <ServiceDiscoveryPage />
-              </Route>
-              <Route path="/status">
-                <StatusPage />
-              </Route>
-              <Route path="/tsdb-status">
-                <TSDBStatusPage />
-              </Route>
-              <Route path="/targets">
-                <TargetsPage />
-              </Route>
-            </Switch>
+              <Route path="/" element={<Navigate to="/graph" />} />
+              <Route path="/graph" element={<PanelListPage />} />
+              <Route path="/alerts" element={<AlertsPage />} />
+              <Route path="/config" element={<ConfigPage />} />
+              <Route path="/flags" element={<FlagsPage />} />
+              <Route path="/rules" element={<RulesPage />} />
+              <Route path="/service-discovery" element={<ServiceDiscoveryPage />} />
+              <Route path="/status" element={<StatusPage />} />
+              <Route path="/tsdb-status" element={<TSDBStatusPage />} />
+              <Route path="/targets" element={<TargetsPage />} />
+            </Routes>
           </Container>
         </Router>
       </PathPrefixContext.Provider>
