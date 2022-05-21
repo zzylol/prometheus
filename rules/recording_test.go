@@ -29,6 +29,8 @@ import (
 )
 
 func TestRuleEval(t *testing.T) {
+	t.Log("Hi! in TestRuleEval!")	
+
 	storage := teststorage.New(t)
 	defer storage.Close()
 
@@ -74,7 +76,10 @@ func TestRuleEval(t *testing.T) {
 
 	for _, test := range suite {
 		rule := NewRecordingRule(test.name, test.expr, test.labels)
+		start_time := time.Now()
 		result, err := rule.Eval(ctx, now, EngineQueryFunc(engine, storage), nil, 0)
+		elapsed := time.Since(start_time)
+		t.Log("time used is:", elapsed)
 		if test.err == "" {
 			require.NoError(t, err)
 		} else {
