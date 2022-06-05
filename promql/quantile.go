@@ -18,6 +18,7 @@ import (
 	"sort"
 
 	"github.com/prometheus/prometheus/model/labels"
+	"github.com/DataDog/sketches-go/ddsketch"
 )
 
 // Helpers to calculate quantiles.
@@ -212,4 +213,24 @@ func quantile(q float64, values vectorByValueHeap) float64 {
 
 	weight := rank - math.Floor(rank)
 	return values[int(lowerIndex)].V*(1-weight) + values[int(upperIndex)].V*weight
+}
+
+func DDSketchQuantile(q float64, values vectorByValueHeap, relativeAccuracy float64) float64 {
+	if len(values) == 0 || math.IsNaN(q) {
+		return math.NaN()
+	}
+	if q < 0 {
+		return math.Inf(-1)
+	}
+	if q > 1 {
+		return math.Inf(+1)
+	}
+	sketch, _ := ddsketch.NewDefaultDDSketch(relativeAccuracy)
+	for _, v := range values {
+		sketch.Add(v.V)
+	}
+
+	qs := []float64{q}
+	result, _ := sketch.GetValuesAtQuantiles(qs)
+	return result[0];
 }

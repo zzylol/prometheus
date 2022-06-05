@@ -45,6 +45,8 @@ import (
 // Scalar results should be returned as the value of a sample in a Vector.
 type FunctionCall func(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector
 
+type ApproximateFunctionCall func(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper, relativeAccuracy float64) Vector
+
 // === time() float64 ===
 func funcTime(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
 	return Vector{Sample{Point: Point{
@@ -1066,6 +1068,12 @@ func funcYear(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper)
 	})
 }
 
+// approximate FunctionCalls
+var ApproximateFunctionCalls = map[string]ApproximateFunctionCall {
+	"quantile_over_time_sketch": funcQuantileOverTimeDDSketch,
+}
+
+
 // FunctionCalls is a list of all functions supported by PromQL, including their types.
 var FunctionCalls = map[string]FunctionCall{
 	"abs":                funcAbs,
@@ -1246,4 +1254,19 @@ func stringFromArg(e parser.Expr) string {
 	tmp := unwrapStepInvariantExpr(e) // Unwrap StepInvariant
 	unwrapParenExpr(&tmp)             // Optionally unwrap ParenExpr
 	return tmp.(*parser.StringLiteral).Val
+}
+
+
+// === quantile_over_time(Matrix parser.ValueTypeMatrix) Vector ===
+func funcQuantileOverTimeDDSketch(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper, relativeAccuracy float64) Vector {
+	q := vals[0].(Vector)[0].V
+	el := vals[1].(Matrix)[0]
+	
+	values := make(vectorByValueHeap, 0, len(el.Points))
+	for _, v := range el.Points {
+		values = append(values, Sample{Point: Point{V: v.V}})
+	}
+	return append(enh.Out, Sample{
+		Point: Point{V: DDSketchQuantile(q, values, relativeAccuracy)},
+	})
 }
