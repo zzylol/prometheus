@@ -1068,7 +1068,7 @@ func funcYear(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper)
 	})
 }
 
-// approximate FunctionCalls
+// Approximate FunctionCalls is a list of all functions supported by PromQL, including their types.
 var ApproximateFunctionCalls = map[string]ApproximateFunctionCall {
 	"quantile_over_time_sketch": funcQuantileOverTimeDDSketch,
 }

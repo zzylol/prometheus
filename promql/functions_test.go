@@ -31,7 +31,6 @@ func TestDeriv(t *testing.T) {
 	// https://github.com/prometheus/prometheus/issues/2674#issuecomment-315439393
 	// This requires more precision than the usual test system offers,
 	// so we test it by hand.
-	t.Log("in TestDeriv")
 	storage := teststorage.New(t)
 	defer storage.Close()
 	opts := EngineOpts{
@@ -44,32 +43,29 @@ func TestDeriv(t *testing.T) {
 
 	a := storage.Appender(context.Background())
 
+	var start, interval, i int64
 	metric := labels.FromStrings("__name__", "foo")
-	start := 0
-	// interval := 30 * 1000
+	start = 1493712816939
+	interval = 30 * 1000
 	// Introduce some timestamp jitter to test 0 slope case.
 	// https://github.com/prometheus/prometheus/issues/7180
-	for i := 0; i < 10000000; i++ {
-		jitter := 400 * i % 30
-		a.Append(0, metric, int64(start+jitter), 1) // add some data to test storage
+	for i = 0; i < 15; i++ {
+		jitter := 12 * i % 2
+		a.Append(0, metric, int64(start+interval*i+jitter), 1)
 	}
 
 	require.NoError(t, a.Commit())
 
-	query, err := engine.NewInstantQuery(storage, "deriv(foo[30m])", timestamp.Time(0))
-	
+	query, err := engine.NewInstantQuery(storage, "deriv(foo[30m])", timestamp.Time(1493712846939))
 	require.NoError(t, err)
 
-	start_time := time.Now()
 	result := query.Exec(context.Background())
 	require.NoError(t, result.Err)
-	elapsed := time.Since(start_time)
-	t.Log("time used is:", elapsed)
 
 	vec, _ := result.Vector()
-	t.Log(vec)
-	//require.Equal(t, 1, len(vec), "Expected 1 result, got %d", len(vec))
-	// require.Equal(t, 0.0, vec[0].V, "Expected 0.0 as value, got %f", vec[0].V)
+	t.Log(vec[0].V)
+	require.Equal(t, 1, len(vec), "Expected 1 result, got %d", len(vec))
+	require.Equal(t, 0.0, vec[0].V, "Expected 0.0 as value, got %f", vec[0].V)
 }
 
 func TestFunctionList(t *testing.T) {

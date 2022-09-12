@@ -89,6 +89,52 @@ func TestRuleEval(t *testing.T) {
 	}
 }
 
+func TestRuleEvalPressure(t *testing.T) {
+	t.Log("Hi! in TestRuleEvalPressure!")	
+
+	suite, err := promql.NewTest(t, `
+		load 1s
+			http_requests{job="app-server", instance="0", group="canary", severity="overwrite-me"}	75 85  95 105 105  95  85
+			http_requests{job="app-server", instance="1", group="canary", severity="overwrite-me"}	80 90 100 110 120 130 140
+	`)
+	require.NoError(t, err)
+	defer suite.Close()
+
+	err = suite.Run()
+	require.NoError(t, err)
+
+	expr, err := parser.ParseExpr(`sum by(instance) (quantile_over_time(0.99, http_requests[5m]))`)
+	require.NoError(t, err)
+
+	
+	evalTime := time.Unix(10, 0)
+
+	tests := []struct {
+		name   string
+		expr   parser.Expr
+		labels labels.Labels
+	}{
+		{
+			name:   "quantile_over_time:recording_test",
+			expr:   &parser.NumberLiteral{Val: 1},
+			labels: labels.Labels{},
+		},
+	}
+
+	for _, test := range tests {
+		test.expr = expr
+		rule := NewRecordingRule(test.name, test.expr, test.labels)
+		start_time := time.Now()
+		result, _ := rule.Eval(suite.Context(), evalTime, EngineQueryFunc(suite.QueryEngine(), suite.Storage()), nil, 0) // no limit here
+		elapsed := time.Since(start_time)
+		t.Log("Eval time used is:", elapsed)
+		t.Log("Eval result is:\n", result)
+	}
+}
+
+
+
+
 func TestRecordingRuleHTMLSnippet(t *testing.T) {
 	expr, err := parser.ParseExpr(`foo{html="<b>BOLD<b>"}`)
 	require.NoError(t, err)
