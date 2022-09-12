@@ -127,3 +127,15 @@ Apache License 2.0, see [LICENSE](https://github.com/prometheus/prometheus/blob/
 [hub]: https://hub.docker.com/r/prom/prometheus/
 [circleci]: https://circleci.com/gh/prometheus/prometheus
 [quay]: https://quay.io/repository/prometheus/prometheus
+
+## Use pprof to profile with go test
+CPU usage profile: 
+```
+go test -cpuprofile cpu.prof -bench .
+go tool pprof -http 10.241.34.249:9999 -edgefraction 0 -nodefraction 0 -nodecount 10000 cpu.prof
+```
+
+Memory usage profile:
+```
+go test -memprofile mem.prof -bench .
+```
