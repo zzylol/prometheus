@@ -11,8 +11,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 package rules
 
+/*
 import (
 	"context"
 	"html/template"
@@ -518,3 +520,5 @@ func TestAlertingRuleLimit(t *testing.T) {
 		}
 	}
 }
+
+*/
