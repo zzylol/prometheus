@@ -114,7 +114,9 @@ func TestRuleEvalPressure(t *testing.T) {
 	err = suite.Run() // just load data 
 	require.NoError(t, err)
 
+	// quantile
 	expr, err := parser.ParseExpr(`sum by(instance) (quantile_over_time(0.99, http_requests[900s]))`)
+	// expr, err := parser.ParseExpr(`sum by(instance) (avg_over_time(http_requests[900s]))`)
 	require.NoError(t, err)
 
 
