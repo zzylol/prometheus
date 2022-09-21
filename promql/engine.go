@@ -184,7 +184,7 @@ func (q *query) Exec(ctx context.Context) *Result {
 	}
 
 	// Exec query.
-	res, warnings, err := q.ng.exec(ctx, q)
+	res, warnings, err := q.ng.exec(ctx, q) // *Engine.exec
 
 	return &Result{Err: err, Value: res, Warnings: warnings}
 }
@@ -568,6 +568,8 @@ func (ng *Engine) exec(ctx context.Context, q *query) (v parser.Value, ws storag
 		return nil, nil, err
 	}
 
+	fmt.Println(q)
+
 	switch s := q.Statement().(type) {
 	case *parser.EvalStmt:
 		return ng.execEvalStmt(ctx, q, s)
@@ -617,7 +619,9 @@ func (ng *Engine) execEvalStmt(ctx context.Context, query *query, s *parser.Eval
 			lookbackDelta:            ng.lookbackDelta,
 			noStepSubqueryIntervalFn: ng.noStepSubqueryIntervalFn,
 		}
-
+		
+		fmt.Println("in *Engine execEvalStmt")
+		fmt.Println(s.Expr)
 		val, warnings, err := evaluator.Eval(s.Expr)
 		if err != nil {
 			return nil, warnings, err
@@ -999,12 +1003,14 @@ func (ev *evaluator) rangeEval(prepSeries func(labels.Labels, *EvalSeriesHelper)
 	origMatrixes := make([]Matrix, len(exprs))
 	originalNumSamples := ev.currentSamples
 
+	fmt.Println("in *evaluator rangeEval")
+	fmt.Println(exprs)
 	var warnings storage.Warnings
 	for i, e := range exprs {
 		// Functions will take string arguments from the expressions, not the values.
 		if e != nil && e.Type() != parser.ValueTypeString {
 			// ev.currentSamples will be updated to the correct value within the ev.eval call.
-			val, ws := ev.eval(e)
+			val, ws := ev.eval(e) // For example, "avg_over_time(http_requests[15m])"
 			warnings = append(warnings, ws...)
 			matrixes[i] = val.(Matrix)
 
@@ -1193,6 +1199,9 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 	ev.ctx = ctxWithSpan
 	defer span.End()
 
+	fmt.Println("in *evaluator eval()")
+	fmt.Println(expr)
+
 	switch e := expr.(type) {
 	case *parser.AggregateExpr:
 		// Grouping labels must be sorted (expected both by generateGroupingKey() and aggregation()).
@@ -1224,6 +1233,11 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 
 	case *parser.Call:
 		call := FunctionCalls[e.Func.Name]
+
+		fmt.Println("in parser.Call")
+		fmt.Println(e)
+
+
 		if e.Func.Name == "timestamp" {
 			// Matrix evaluation always returns the evaluation time,
 			// so this function needs special handling when given
@@ -1324,7 +1338,7 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 		it := storage.NewBuffer(selRange)
 		for i, s := range selVS.Series {
 			ev.currentSamples -= len(points)
-			points = points[:0]
+			points = points[:0] // to use sliding window, PointSlice should be extended to store every series 
 			it.Reset(s.Iterator())
 			metric := selVS.Series[i].Labels()
 			// The last_over_time function acts like offset; thus, it
@@ -1352,7 +1366,11 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 				maxt := ts - offset
 				mint := maxt - selRange
 				// Evaluate the matrix selector for this series for this step.
-				points = ev.matrixIterSlice(it, mint, maxt, points)
+				fmt.Println("in parser.Call inner")
+				fmt.Println("mint maxt points")
+				fmt.Println(mint, maxt, points)
+				points = ev.matrixIterSlice(it, mint, maxt, points) // sliding window, but points are always []
+				fmt.Println(mint, maxt, points)
 				if len(points) == 0 {
 					continue
 				}

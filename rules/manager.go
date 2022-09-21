@@ -21,6 +21,7 @@ import (
 	"sort"
 	"sync"
 	"time"
+	// "fmt"
 
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
@@ -185,11 +186,15 @@ type QueryFunc func(ctx context.Context, q string, t time.Time) (promql.Vector, 
 // It converts scalar into vector results.
 func EngineQueryFunc(engine *promql.Engine, q storage.Queryable) QueryFunc {
 	return func(ctx context.Context, qs string, t time.Time) (promql.Vector, error) {
+		// qs: entire input query string 
 		q, err := engine.NewInstantQuery(q, qs, t)
+		
 		if err != nil {
 			return nil, err
 		}
-		res := q.Exec(ctx)
+		res := q.Exec(ctx) // res: instant the outmost query result 
+		// fmt.Print("res of q.Exec = ")
+		// fmt.Println(res)
 		if res.Err != nil {
 			return nil, res.Err
 		}
