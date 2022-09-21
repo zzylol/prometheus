@@ -1338,7 +1338,7 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 		it := storage.NewBuffer(selRange)
 		for i, s := range selVS.Series {
 			ev.currentSamples -= len(points)
-			points = points[:0] // to use sliding window, PointSlice should be extended to store every series 
+			points = points[:0] // to use sliding window of source points, PointSlice should be extended to store every series => further add intermedia data structre for result sliding window
 			it.Reset(s.Iterator())
 			metric := selVS.Series[i].Labels()
 			// The last_over_time function acts like offset; thus, it
