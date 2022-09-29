@@ -15,12 +15,14 @@ package rules
 
 import (
 	"context"
+	"fmt"
 	html_template "html/template"
 	"math"
 	"net/url"
 	"sort"
 	"sync"
 	"time"
+
 	// "fmt"
 
 	"github.com/go-kit/log"
@@ -186,13 +188,13 @@ type QueryFunc func(ctx context.Context, q string, t time.Time) (promql.Vector, 
 // It converts scalar into vector results.
 func EngineQueryFunc(engine *promql.Engine, q storage.Queryable) QueryFunc {
 	return func(ctx context.Context, qs string, t time.Time) (promql.Vector, error) {
-		// qs: entire input query string 
+		// qs: entire input query string
 		q, err := engine.NewInstantQuery(q, qs, t)
-		
+
 		if err != nil {
 			return nil, err
 		}
-		res := q.Exec(ctx) // res: instant the outmost query result 
+		res := q.Exec(ctx) // res: instant the outmost query result
 		// fmt.Print("res of q.Exec = ")
 		// fmt.Println(res)
 		if res.Err != nil {
@@ -364,6 +366,9 @@ func (g *Group) run(ctx context.Context) {
 	// The assumption here is that since the ticker was started after having
 	// waited for `evalTimestamp` to pass, the ticks will trigger soon
 	// after each `evalTimestamp + N * g.interval` occurrence.
+
+	fmt.Println("******** *Group.run() **********")
+	fmt.Println("g.interval =", g.interval)
 	tick := time.NewTicker(g.interval)
 	defer tick.Stop()
 
