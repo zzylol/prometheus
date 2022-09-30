@@ -173,7 +173,7 @@ func (q *query) Cancel() {
 // Close implements the Query interface.
 func (q *query) Close() {
 	for _, s := range q.matrix {
-		putPointSlice(s.Points)
+		putPointSliceResult(s.Metric, s.Points)
 	}
 }
 
@@ -1138,7 +1138,7 @@ func (ev *evaluator) rangeEval(prepSeries func(labels.Labels, *EvalSeriesHelper)
 			if !ok {
 				ss = Series{
 					Metric: sample.Metric,
-					Points: getPointSlice(numSteps),
+					Points: getPointSliceResult(sample.Metric, numSteps),
 				}
 			}
 			sample.Point.T = ts
@@ -1151,7 +1151,7 @@ func (ev *evaluator) rangeEval(prepSeries func(labels.Labels, *EvalSeriesHelper)
 	// Reuse the original point slices.
 	for _, m := range origMatrixes {
 		for _, s := range m {
-			putPointSlice(s.Points)
+			putPointSliceResult(s.Metric, s.Points)
 		}
 	}
 	// Assemble the output matrix. By the time we get here we know we don't have too many samples.
@@ -1328,9 +1328,9 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 		unwrapParenExpr(&arg)
 		sel := arg.(*parser.MatrixSelector)
 		fmt.Println("sel =", sel)
-		fmt.Println("sel.Range =", sel.Range) // e.g., 10s in http_requests[10s]
-		selVS := sel.VectorSelector.(*parser.VectorSelector)
-		fmt.Println("selVS =", selVS) // e.g., http_requets
+		fmt.Println("sel.Range =", sel.Range)                // e.g., 10s in http_requests[10s]
+		selVS := sel.VectorSelector.(*parser.VectorSelector) // type is *parser.VectorSelector
+		fmt.Println("selVS =", selVS)                        // e.g., http_requets
 
 		ws, err := checkAndExpandSeriesSet(ev.ctx, sel)
 		warnings = append(warnings, ws...)
@@ -1348,7 +1348,11 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 			stepRange = ev.interval
 		}
 		// Reuse objects across steps to save memory allocations.
-		points := getPointSlice(16)
+		/* Modified by Zeying */
+		// points := make(map[Metric][]Point)
+		// points := getPointSlice(16)
+		points_metric := make(map[uint64]([]Point))
+
 		inMatrix := make(Matrix, 1) // Matrix is []Series
 		inArgs[matrixArgIndex] = inMatrix
 		enh := &EvalNodeHelper{Out: make(Vector, 0, 1)}
@@ -1356,10 +1360,14 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 		it := storage.NewBuffer(selRange)
 		for i, s := range selVS.Series {
 			fmt.Println("selVS.Series[i] =", s) // e.g., http_requests metric has multiple serieses (different labels, instance = 0, instance = 1)
-			ev.currentSamples -= len(points)
+			/* Modified by Zeying */
+			ev.currentSamples -= len(points_metric[selVS.Series[i].Labels().Hash()])
+
 			// points = points[:0] // to use sliding window over points in each series, PointSlice should be extended to store every series => further add intermediate data structre for result sliding window
+
 			it.Reset(s.Iterator())
 			metric := selVS.Series[i].Labels()
+			fmt.Println("selVS.Series[i].Labels() =", metric)
 			// The last_over_time function acts like offset; thus, it
 			// should keep the metric name.  For all the other range
 			// vector functions, the only change needed is to drop the
@@ -1369,9 +1377,11 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 			}
 			ss := Series{
 				Metric: metric,
-				Points: getPointSlice(numSteps),
+				Points: getPointSliceResult(metric, numSteps),
 			}
 			inMatrix[0].Metric = selVS.Series[i].Labels()
+
+			points_metric[selVS.Series[i].Labels().Hash()] = getPointSliceSeries(selVS.Series[i].Labels(), 16)
 
 			fmt.Println(ev.startTimestamp, ev.endTimestamp)
 
@@ -1390,13 +1400,13 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 				// Evaluate the matrix selector for this series for this step.
 				fmt.Println("in parser.Call inner")
 				fmt.Println("mint maxt points")
-				fmt.Println("before", mint, maxt, points)
-				points = ev.matrixIterSlice(it, mint, maxt, points) // sliding window, but points are always []
-				fmt.Println("after", mint, maxt, points)
-				if len(points) == 0 {
+				fmt.Println("before:", mint, maxt, points_metric[selVS.Series[i].Labels().Hash()])
+				points_metric[selVS.Series[i].Labels().Hash()] = ev.matrixIterSlice(it, mint, maxt, points_metric[selVS.Series[i].Labels().Hash()]) // sliding window, but points are always []
+				fmt.Println("after:", mint, maxt, points_metric[selVS.Series[i].Labels().Hash()])
+				if len(points_metric[selVS.Series[i].Labels().Hash()]) == 0 {
 					continue
 				}
-				inMatrix[0].Points = points
+				inMatrix[0].Points = points_metric[selVS.Series[i].Labels().Hash()]
 				enh.Ts = ts
 				// Make the function call.
 				outVec := call(inArgs, e.Args, enh)
@@ -1415,12 +1425,12 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 					ev.error(ErrTooManySamples(env))
 				}
 			} else {
-				putPointSlice(ss.Points)
+				putPointSliceResult(metric, ss.Points)
 			}
-		}
 
-		ev.currentSamples -= len(points)
-		putPointSlice(points)
+			ev.currentSamples -= len(points_metric[selVS.Series[i].Labels().Hash()])
+			putPointSliceSeries(selVS.Series[i].Labels(), points_metric[selVS.Series[i].Labels().Hash()])
+		}
 
 		// The absent_over_time function returns 0 or 1 series. So far, the matrix
 		// contains multiple series. The following code will create a new series
@@ -1548,7 +1558,7 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 			it.Reset(s.Iterator())
 			ss := Series{
 				Metric: e.Series[i].Labels(),
-				Points: getPointSlice(numSteps),
+				Points: getPointSliceResult(e.Series[i].Labels(), numSteps),
 			}
 
 			for ts := ev.startTimestamp; ts <= ev.endTimestamp; ts += ev.interval {
@@ -1566,7 +1576,7 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 			if len(ss.Points) > 0 {
 				mat = append(mat, ss)
 			} else {
-				putPointSlice(ss.Points)
+				putPointSliceResult(ss.Metric, ss.Points)
 			}
 		}
 		return mat, ws
@@ -1724,19 +1734,38 @@ func (ev *evaluator) vectorSelectorSingle(it *storage.MemoizedSeriesIterator, no
 	return t, v, true
 }
 
-var pointPool = sync.Pool{} //
+var pointPools_series = make(map[uint64](sync.Pool{}))
 
-func getPointSlice(sz int) []Point {
-	p := pointPool.Get()
+func getPointSliceSeries(metric labels.Labels, sz int) []Point {
+	h := metric.Hash()
+	p := pointPools_series[h].Get()
 	if p != nil {
 		return p.([]Point)
 	}
 	return make([]Point, 0, sz)
 }
 
-func putPointSlice(p []Point) {
+func putPointSliceSeries(metric labels.Labels, p []Point) {
 	//nolint:staticcheck // Ignore SA6002 relax staticcheck verification.
-	pointPool.Put(p[:0])
+	h := metric.Hash()
+	pointPools_series[h].Put(p[:0])
+}
+
+var pointPools_result = make(map[uint64](sync.Pool{}))
+
+func getPointSliceResult(metric labels.Labels, sz int) []Point {
+	h := metric.Hash()
+	p := pointPools_result[h].Get()
+	if p != nil {
+		return p.([]Point)
+	}
+	return make([]Point, 0, sz)
+}
+
+func putPointSliceResult(metric labels.Labels, p []Point) {
+	//nolint:staticcheck // Ignore SA6002 relax staticcheck verification.
+	h := metric.Hash()
+	pointPools_result[h].Put(p[:0])
 }
 
 // matrixSelector evaluates a *parser.MatrixSelector expression.
@@ -1766,12 +1795,12 @@ func (ev *evaluator) matrixSelector(node *parser.MatrixSelector) (Matrix, storag
 			Metric: series[i].Labels(),
 		}
 
-		ss.Points = ev.matrixIterSlice(it, mint, maxt, getPointSlice(16))
+		ss.Points = ev.matrixIterSlice(it, mint, maxt, getPointSliceResult(ss.Metric, 16))
 
 		if len(ss.Points) > 0 {
 			matrix = append(matrix, ss)
 		} else {
-			putPointSlice(ss.Points)
+			putPointSliceResult(ss.Metric, ss.Points)
 		}
 	}
 	return matrix, ws
@@ -1825,14 +1854,12 @@ func (ev *evaluator) matrixIterSlice(it *storage.BufferedSeriesIterator, mint, m
 			}
 			ev.currentSamples++
 			out = append(out, Point{T: t, V: v})
-			fmt.Println("in matrixIterSlice buffer: t == maxt?", (t == maxt))
 		}
 	}
 	// The seeked sample might also be in the range.
 	if ok {
 		t, v := it.At()
 		if t >= mint && t == maxt && !value.IsStaleNaN(v) {
-			fmt.Println("in matrixIterSlice last: t == maxt?", (t == maxt))
 			if ev.currentSamples >= ev.maxSamples {
 				ev.error(ErrTooManySamples(env))
 			}
