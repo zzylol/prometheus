@@ -1736,7 +1736,7 @@ func (ev *evaluator) vectorSelectorSingle(it *storage.MemoizedSeriesIterator, no
 }
 
 // var pointPools_series = make(map[uint64](sync.Pool{}))
-var pointPools_series = make(map[uint64]([]Point))
+var pointPools_series = make(map[uint64]([]Point)) // TODO: check array memory usage in go
 
 func getPointSliceSeries(metric labels.Labels, sz int) []Point {
 	h := metric.Hash()
@@ -1763,7 +1763,7 @@ func setPointSliceSeries(metric labels.Labels, p []Point) {
 }
 
 // var pointPools_result = make(map[uint64](sync.Pool{}))
-var pointPools_result = make(map[uint64]([]Point))
+var pointPools_result = make(map[uint64]([]Point)) // TODO: check array memory usage in go
 
 func getPointSliceResult(metric labels.Labels, sz int) []Point {
 	h := metric.Hash()
