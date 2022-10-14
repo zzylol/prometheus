@@ -175,7 +175,7 @@ func (q *query) Cancel() {
 // Close implements the Query interface.
 func (q *query) Close() {
 	for _, s := range q.matrix {
-		putPointSliceResult(s.Metric, s.Points)
+		putPointSlice(s.Points)
 	}
 }
 
@@ -1155,7 +1155,7 @@ func (ev *evaluator) rangeEval(prepSeries func(labels.Labels, *EvalSeriesHelper)
 			if !ok {
 				ss = Series{
 					Metric: sample.Metric,
-					Points: getPointSliceResult(sample.Metric, numSteps),
+					Points: getPointSlice(numSteps),
 				}
 			}
 			sample.Point.T = ts
@@ -1168,7 +1168,7 @@ func (ev *evaluator) rangeEval(prepSeries func(labels.Labels, *EvalSeriesHelper)
 	// Reuse the original point slices.
 	for _, m := range origMatrixes {
 		for _, s := range m {
-			putPointSliceResult(s.Metric, s.Points)
+			putPointSlice(s.Points)
 		}
 	}
 	// Assemble the output matrix. By the time we get here we know we don't have too many samples.
@@ -1392,6 +1392,7 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 		// points := make(map[Metric][]Point)
 		// points := getPointSlice(16)
 		points_metric := make(map[uint64]([]Point))
+		// metric_result := make(map[uint64]([]Point))
 
 		inMatrix := make(Matrix, 1) // Matrix is []Series
 		inArgs[matrixArgIndex] = inMatrix
@@ -1421,7 +1422,7 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 			}
 			ss := Series{
 				Metric: metric,
-				Points: getPointSliceResult(metric, numSteps),
+				Points: getPointSlice(numSteps),
 			}
 			inMatrix[0].Metric = selVS.Series[i].Labels()
 
@@ -1477,7 +1478,7 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 					ev.error(ErrTooManySamples(env))
 				}
 			} else {
-				putPointSliceResult(metric, ss.Points)
+				putPointSlice(ss.Points)
 			}
 
 			ev.currentSamples -= len(points_metric[selVS.Series[i].Labels().Hash()])
@@ -1611,7 +1612,7 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 			it.Reset(s.Iterator())
 			ss := Series{
 				Metric: e.Series[i].Labels(),
-				Points: getPointSliceResult(e.Series[i].Labels(), numSteps),
+				Points: getPointSlice(numSteps),
 			}
 
 			for ts := ev.startTimestamp; ts <= ev.endTimestamp; ts += ev.interval {
@@ -1629,7 +1630,7 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 			if len(ss.Points) > 0 {
 				mat = append(mat, ss)
 			} else {
-				putPointSliceResult(ss.Metric, ss.Points)
+				putPointSlice(ss.Points)
 			}
 		}
 		return mat, ws
@@ -1787,7 +1788,21 @@ func (ev *evaluator) vectorSelectorSingle(it *storage.MemoizedSeriesIterator, no
 	return t, v, true
 }
 
-// var pointPools_series = make(map[uint64](sync.Pool{}))
+var pointPool = sync.Pool{}
+
+func getPointSlice(sz int) []Point {
+	p := pointPool.Get()
+	if p != nil {
+		return p.([]Point)
+	}
+	return make([]Point, 0, sz)
+}
+
+func putPointSlice(p []Point) {
+	//nolint:staticcheck // Ignore SA6002 relax staticcheck verification.
+	pointPool.Put(p[:0])
+}
+
 var pointPools_series = make(map[uint64]([]Point)) // TODO: check array memory usage in go
 
 func getPointSliceSeries(metric labels.Labels, sz int) []Point {
@@ -1816,22 +1831,32 @@ func setPointSliceSeries(metric labels.Labels, p []Point) {
 	pointPools_series[h] = p
 }
 
-// var pointPools_result = make(map[uint64](sync.Pool{}))
 var pointPools_result = make(map[uint64]([]Point)) // TODO: check array memory usage in go
 
 func getPointSliceResult(metric labels.Labels, sz int) []Point {
 	h := metric.Hash()
-	p := pointPools_result[h]
+	p := pointPools_series[h]
+	if debug == 1 {
+		fmt.Println("getPointSliceSeries: ", pointPools_result)
+	}
 	if p != nil {
 		return p
 	}
 	return make([]Point, 0, sz)
 }
 
-func putPointSliceResult(metric labels.Labels, p []Point) { // TODO: check result pool correctness
+/*
+func putPointSliceSeries(metric labels.Labels, p []Point) {
 	//nolint:staticcheck // Ignore SA6002 relax staticcheck verification.
 	h := metric.Hash()
-	pointPools_result[h] = append(pointPools_result[h], p...)
+	pointPools_series[h] = append(pointPools_series[h], p...)
+}
+*/
+
+func setPointSliceResult(metric labels.Labels, p []Point) {
+	//nolint:staticcheck // Ignore SA6002 relax staticcheck verification.
+	h := metric.Hash()
+	pointPools_series[h] = p
 }
 
 // matrixSelector evaluates a *parser.MatrixSelector expression.
@@ -1861,12 +1886,12 @@ func (ev *evaluator) matrixSelector(node *parser.MatrixSelector) (Matrix, storag
 			Metric: series[i].Labels(),
 		}
 
-		ss.Points = ev.matrixIterSlice(it, mint, maxt, getPointSliceResult(ss.Metric, 16))
+		ss.Points = ev.matrixIterSlice(it, mint, maxt, getPointSlice(16))
 
 		if len(ss.Points) > 0 {
 			matrix = append(matrix, ss)
 		} else {
-			putPointSliceResult(ss.Metric, ss.Points)
+			putPointSlice(ss.Points)
 		}
 	}
 	return matrix, ws
@@ -1955,7 +1980,8 @@ func (ev *evaluator) matrixIterSliceSeries(it *storage.BufferedSeriesIterator, m
 		for drop = 0; out[drop].T < mint; drop++ {
 		}
 		ev.currentSamples -= drop
-		copy(out, out[drop:])
+		copy(out, out[drop:]) // copy() is deep copy
+		// out = out[drop:] // assignment is shallow copy, TODO: check if goroutine safe
 		out = out[:len(out)-drop]
 		// Only append points with timestamps after the last timestamp we have.
 		mint = out[len(out)-1].T + 1
@@ -1971,6 +1997,7 @@ func (ev *evaluator) matrixIterSliceSeries(it *storage.BufferedSeriesIterator, m
 		}
 	}
 
+	iter := 0
 	buf := it.Buffer()
 	for buf.Next() {
 		t, v := buf.At()
@@ -1984,6 +2011,7 @@ func (ev *evaluator) matrixIterSliceSeries(it *storage.BufferedSeriesIterator, m
 			}
 			ev.currentSamples++
 			out = append(out, Point{T: t, V: v})
+			iter++
 		}
 	}
 	// The seeked sample might also be in the range.
@@ -1996,7 +2024,9 @@ func (ev *evaluator) matrixIterSliceSeries(it *storage.BufferedSeriesIterator, m
 			out = append(out, Point{T: t, V: v})
 			ev.currentSamples++
 		}
+		iter++
 	}
+	fmt.Println("MatrixIterSliceSeries: ", iter)
 	return out
 }
 
