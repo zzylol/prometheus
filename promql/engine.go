@@ -1997,7 +1997,7 @@ func (ev *evaluator) matrixIterSliceSeries(it *storage.BufferedSeriesIterator, m
 		}
 	}
 
-	iter := 0
+	// iter := 0
 	buf := it.Buffer()
 	for buf.Next() {
 		t, v := buf.At()
@@ -2011,7 +2011,7 @@ func (ev *evaluator) matrixIterSliceSeries(it *storage.BufferedSeriesIterator, m
 			}
 			ev.currentSamples++
 			out = append(out, Point{T: t, V: v})
-			iter++
+			// iter++
 		}
 	}
 	// The seeked sample might also be in the range.
@@ -2024,9 +2024,9 @@ func (ev *evaluator) matrixIterSliceSeries(it *storage.BufferedSeriesIterator, m
 			out = append(out, Point{T: t, V: v})
 			ev.currentSamples++
 		}
-		iter++
+		// iter++
 	}
-	fmt.Println("MatrixIterSliceSeries: ", iter)
+	// fmt.Println("MatrixIterSliceSeries: ", iter)
 	return out
 }
 
