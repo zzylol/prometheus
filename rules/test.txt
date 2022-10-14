@@ -1,1 +1,577 @@
-FAIL	github.com/prometheus/prometheus/rules [build failed]
+=== RUN   TestAlertingRule
+    manager_test.go:159: case 0
+************* Engine exec() ***********
+Engine Exec(): q =  http_requests{group="canary",job="app-server"} < 100
+in *Engine execEvalStmt
+http_requests{group="canary",job="app-server"} < 100
+in *evaluator eval()
+http_requests{group="canary",job="app-server"} < 100
+in *evaluator rangeEval
+[http_requests{group="canary",job="app-server"} 100]
+in *evaluator eval()
+http_requests{group="canary",job="app-server"}
+in *evaluator eval()
+100
+in *evaluator eval()
+100
+in *evaluator rangeEval
+[]
+******** in rangeEval: Timestamp **********
+0 0 1
+******** in rangeEval: Timestamp **********
+0 0 1
+    manager_test.go:159: case 1
+************* Engine exec() ***********
+Engine Exec(): q =  http_requests{group="canary",job="app-server"} < 100
+in *Engine execEvalStmt
+http_requests{group="canary",job="app-server"} < 100
+in *evaluator eval()
+http_requests{group="canary",job="app-server"} < 100
+in *evaluator rangeEval
+[http_requests{group="canary",job="app-server"} 100]
+in *evaluator eval()
+http_requests{group="canary",job="app-server"}
+in *evaluator eval()
+100
+in *evaluator eval()
+100
+in *evaluator rangeEval
+[]
+******** in rangeEval: Timestamp **********
+300000 300000 1
+******** in rangeEval: Timestamp **********
+300000 300000 1
+    manager_test.go:159: case 2
+************* Engine exec() ***********
+Engine Exec(): q =  http_requests{group="canary",job="app-server"} < 100
+in *Engine execEvalStmt
+http_requests{group="canary",job="app-server"} < 100
+in *evaluator eval()
+http_requests{group="canary",job="app-server"} < 100
+in *evaluator rangeEval
+[http_requests{group="canary",job="app-server"} 100]
+in *evaluator eval()
+http_requests{group="canary",job="app-server"}
+in *evaluator eval()
+100
+in *evaluator eval()
+100
+in *evaluator rangeEval
+[]
+******** in rangeEval: Timestamp **********
+600000 600000 1
+******** in rangeEval: Timestamp **********
+600000 600000 1
+    manager_test.go:159: case 3
+************* Engine exec() ***********
+Engine Exec(): q =  http_requests{group="canary",job="app-server"} < 100
+in *Engine execEvalStmt
+http_requests{group="canary",job="app-server"} < 100
+in *evaluator eval()
+http_requests{group="canary",job="app-server"} < 100
+in *evaluator rangeEval
+[http_requests{group="canary",job="app-server"} 100]
+in *evaluator eval()
+http_requests{group="canary",job="app-server"}
+in *evaluator eval()
+100
+in *evaluator eval()
+100
+in *evaluator rangeEval
+[]
+******** in rangeEval: Timestamp **********
+900000 900000 1
+******** in rangeEval: Timestamp **********
+900000 900000 1
+    manager_test.go:159: case 4
+************* Engine exec() ***********
+Engine Exec(): q =  http_requests{group="canary",job="app-server"} < 100
+in *Engine execEvalStmt
+http_requests{group="canary",job="app-server"} < 100
+in *evaluator eval()
+http_requests{group="canary",job="app-server"} < 100
+in *evaluator rangeEval
+[http_requests{group="canary",job="app-server"} 100]
+in *evaluator eval()
+http_requests{group="canary",job="app-server"}
+in *evaluator eval()
+100
+in *evaluator eval()
+100
+in *evaluator rangeEval
+[]
+******** in rangeEval: Timestamp **********
+1200000 1200000 1
+******** in rangeEval: Timestamp **********
+1200000 1200000 1
+    manager_test.go:159: case 5
+************* Engine exec() ***********
+Engine Exec(): q =  http_requests{group="canary",job="app-server"} < 100
+in *Engine execEvalStmt
+http_requests{group="canary",job="app-server"} < 100
+in *evaluator eval()
+http_requests{group="canary",job="app-server"} < 100
+in *evaluator rangeEval
+[http_requests{group="canary",job="app-server"} 100]
+in *evaluator eval()
+http_requests{group="canary",job="app-server"}
+in *evaluator eval()
+100
+in *evaluator eval()
+100
+in *evaluator rangeEval
+[]
+******** in rangeEval: Timestamp **********
+1500000 1500000 1
+******** in rangeEval: Timestamp **********
+1500000 1500000 1
+    manager_test.go:159: case 6
+************* Engine exec() ***********
+Engine Exec(): q =  http_requests{group="canary",job="app-server"} < 100
+in *Engine execEvalStmt
+http_requests{group="canary",job="app-server"} < 100
+in *evaluator eval()
+http_requests{group="canary",job="app-server"} < 100
+in *evaluator rangeEval
+[http_requests{group="canary",job="app-server"} 100]
+in *evaluator eval()
+http_requests{group="canary",job="app-server"}
+in *evaluator eval()
+100
+in *evaluator eval()
+100
+in *evaluator rangeEval
+[]
+******** in rangeEval: Timestamp **********
+1800000 1800000 1
+******** in rangeEval: Timestamp **********
+1800000 1800000 1
+--- PASS: TestAlertingRule (0.02s)
+=== RUN   TestRuleEvalPressure
+    recording_test.go:106: Hi! in TestRuleEvalPressure!
+************* Engine exec() ***********
+Engine Exec(): q =  sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *Engine execEvalStmt
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator eval()
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator rangeEval
+[<nil> quantile_over_time(0.99, http_requests[5s])]
+in *evaluator eval()
+quantile_over_time(0.99, http_requests[5s])
+in parser.Call
+quantile_over_time(0.99, http_requests[5s])
+e.Func.Name = quantile_over_time
+e.Args = 0.99, http_requests[5s]
+a.(*parser.MatrixSelector) = http_requests[5s]
+in *evaluator eval()
+0.99
+in *evaluator eval()
+0.99
+in *evaluator rangeEval
+[]
+******** in rangeEval: Timestamp **********
+1000 1000 1
+sel = http_requests[5s]
+sel.Range = 5s
+selVS = http_requests
+offset = 0
+stepRange = 5000
+ev.intelval = 1
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[]
+1000 1000
+in parser.Call inner
+mint maxt points
+before: -4000 1000 []
+after: -4000 1000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000]]
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[542105679045456123:[5350.6153770574065 @[0] 1505.6131528658134 @[1000]]]
+1000 1000
+in parser.Call inner
+mint maxt points
+before: -4000 1000 []
+after: -4000 1000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000]]
+******** in rangeEval: Timestamp **********
+1000 1000 1
+************* Engine exec() ***********
+Engine Exec(): q =  sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *Engine execEvalStmt
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator eval()
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator rangeEval
+[<nil> quantile_over_time(0.99, http_requests[5s])]
+in *evaluator eval()
+quantile_over_time(0.99, http_requests[5s])
+in parser.Call
+quantile_over_time(0.99, http_requests[5s])
+e.Func.Name = quantile_over_time
+e.Args = 0.99, http_requests[5s]
+a.(*parser.MatrixSelector) = http_requests[5s]
+in *evaluator eval()
+0.99
+in *evaluator eval()
+0.99
+in *evaluator rangeEval
+[]
+******** in rangeEval: Timestamp **********
+2000 2000 1
+sel = http_requests[5s]
+sel.Range = 5s
+selVS = http_requests
+offset = 0
+stepRange = 5000
+ev.intelval = 1
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[542105679045456123:[5350.6153770574065 @[0] 1505.6131528658134 @[1000]] 14628192197171500314:[5350.6153770574065 @[0] 1505.6131528658134 @[1000]]]
+2000 2000
+in parser.Call inner
+mint maxt points
+before: -3000 2000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000]]
+after: -3000 2000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000]]
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[542105679045456123:[5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000]] 14628192197171500314:[5350.6153770574065 @[0] 1505.6131528658134 @[1000]]]
+2000 2000
+in parser.Call inner
+mint maxt points
+before: -3000 2000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000]]
+after: -3000 2000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000]]
+******** in rangeEval: Timestamp **********
+2000 2000 1
+************* Engine exec() ***********
+Engine Exec(): q =  sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *Engine execEvalStmt
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator eval()
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator rangeEval
+[<nil> quantile_over_time(0.99, http_requests[5s])]
+in *evaluator eval()
+quantile_over_time(0.99, http_requests[5s])
+in parser.Call
+quantile_over_time(0.99, http_requests[5s])
+e.Func.Name = quantile_over_time
+e.Args = 0.99, http_requests[5s]
+a.(*parser.MatrixSelector) = http_requests[5s]
+in *evaluator eval()
+0.99
+in *evaluator eval()
+0.99
+in *evaluator rangeEval
+[]
+******** in rangeEval: Timestamp **********
+3000 3000 1
+sel = http_requests[5s]
+sel.Range = 5s
+selVS = http_requests
+offset = 0
+stepRange = 5000
+ev.intelval = 1
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[542105679045456123:[5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000]] 14628192197171500314:[5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000]]]
+3000 3000
+in parser.Call inner
+mint maxt points
+before: -2000 3000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000]]
+after: -2000 3000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000]]
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[542105679045456123:[5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000]] 14628192197171500314:[5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000]]]
+3000 3000
+in parser.Call inner
+mint maxt points
+before: -2000 3000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000]]
+after: -2000 3000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000]]
+******** in rangeEval: Timestamp **********
+3000 3000 1
+************* Engine exec() ***********
+Engine Exec(): q =  sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *Engine execEvalStmt
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator eval()
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator rangeEval
+[<nil> quantile_over_time(0.99, http_requests[5s])]
+in *evaluator eval()
+quantile_over_time(0.99, http_requests[5s])
+in parser.Call
+quantile_over_time(0.99, http_requests[5s])
+e.Func.Name = quantile_over_time
+e.Args = 0.99, http_requests[5s]
+a.(*parser.MatrixSelector) = http_requests[5s]
+in *evaluator eval()
+0.99
+in *evaluator eval()
+0.99
+in *evaluator rangeEval
+[]
+******** in rangeEval: Timestamp **********
+4000 4000 1
+sel = http_requests[5s]
+sel.Range = 5s
+selVS = http_requests
+offset = 0
+stepRange = 5000
+ev.intelval = 1
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[542105679045456123:[5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000]] 14628192197171500314:[5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000]]]
+4000 4000
+in parser.Call inner
+mint maxt points
+before: -1000 4000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000]]
+after: -1000 4000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000]]
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[542105679045456123:[5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000]] 14628192197171500314:[5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000]]]
+4000 4000
+in parser.Call inner
+mint maxt points
+before: -1000 4000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000]]
+after: -1000 4000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000]]
+******** in rangeEval: Timestamp **********
+4000 4000 1
+************* Engine exec() ***********
+Engine Exec(): q =  sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *Engine execEvalStmt
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator eval()
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator rangeEval
+[<nil> quantile_over_time(0.99, http_requests[5s])]
+in *evaluator eval()
+quantile_over_time(0.99, http_requests[5s])
+in parser.Call
+quantile_over_time(0.99, http_requests[5s])
+e.Func.Name = quantile_over_time
+e.Args = 0.99, http_requests[5s]
+a.(*parser.MatrixSelector) = http_requests[5s]
+in *evaluator eval()
+0.99
+in *evaluator eval()
+0.99
+in *evaluator rangeEval
+[]
+******** in rangeEval: Timestamp **********
+5000 5000 1
+sel = http_requests[5s]
+sel.Range = 5s
+selVS = http_requests
+offset = 0
+stepRange = 5000
+ev.intelval = 1
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[542105679045456123:[5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000]] 14628192197171500314:[5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000]]]
+5000 5000
+in parser.Call inner
+mint maxt points
+before: 0 5000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000]]
+after: 0 5000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000]]
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[542105679045456123:[5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000]] 14628192197171500314:[5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000]]]
+5000 5000
+in parser.Call inner
+mint maxt points
+before: 0 5000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000]]
+after: 0 5000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000]]
+******** in rangeEval: Timestamp **********
+5000 5000 1
+************* Engine exec() ***********
+Engine Exec(): q =  sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *Engine execEvalStmt
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator eval()
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator rangeEval
+[<nil> quantile_over_time(0.99, http_requests[5s])]
+in *evaluator eval()
+quantile_over_time(0.99, http_requests[5s])
+in parser.Call
+quantile_over_time(0.99, http_requests[5s])
+e.Func.Name = quantile_over_time
+e.Args = 0.99, http_requests[5s]
+a.(*parser.MatrixSelector) = http_requests[5s]
+in *evaluator eval()
+0.99
+in *evaluator eval()
+0.99
+in *evaluator rangeEval
+[]
+******** in rangeEval: Timestamp **********
+6000 6000 1
+sel = http_requests[5s]
+sel.Range = 5s
+selVS = http_requests
+offset = 0
+stepRange = 5000
+ev.intelval = 1
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[542105679045456123:[5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000]] 14628192197171500314:[5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000]]]
+6000 6000
+in parser.Call inner
+mint maxt points
+before: 1000 6000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000]]
+after: 1000 6000 [1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000]]
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[542105679045456123:[1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000]] 14628192197171500314:[5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000]]]
+6000 6000
+in parser.Call inner
+mint maxt points
+before: 1000 6000 [5350.6153770574065 @[0] 1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000]]
+after: 1000 6000 [1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000]]
+******** in rangeEval: Timestamp **********
+6000 6000 1
+************* Engine exec() ***********
+Engine Exec(): q =  sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *Engine execEvalStmt
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator eval()
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator rangeEval
+[<nil> quantile_over_time(0.99, http_requests[5s])]
+in *evaluator eval()
+quantile_over_time(0.99, http_requests[5s])
+in parser.Call
+quantile_over_time(0.99, http_requests[5s])
+e.Func.Name = quantile_over_time
+e.Args = 0.99, http_requests[5s]
+a.(*parser.MatrixSelector) = http_requests[5s]
+in *evaluator eval()
+0.99
+in *evaluator eval()
+0.99
+in *evaluator rangeEval
+[]
+******** in rangeEval: Timestamp **********
+7000 7000 1
+sel = http_requests[5s]
+sel.Range = 5s
+selVS = http_requests
+offset = 0
+stepRange = 5000
+ev.intelval = 1
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[542105679045456123:[1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000]] 14628192197171500314:[1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000]]]
+7000 7000
+in parser.Call inner
+mint maxt points
+before: 2000 7000 [1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000]]
+after: 2000 7000 [2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000]]
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[542105679045456123:[2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000]] 14628192197171500314:[1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000]]]
+7000 7000
+in parser.Call inner
+mint maxt points
+before: 2000 7000 [1505.6131528658134 @[1000] 2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000]]
+after: 2000 7000 [2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000]]
+******** in rangeEval: Timestamp **********
+7000 7000 1
+************* Engine exec() ***********
+Engine Exec(): q =  sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *Engine execEvalStmt
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator eval()
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator rangeEval
+[<nil> quantile_over_time(0.99, http_requests[5s])]
+in *evaluator eval()
+quantile_over_time(0.99, http_requests[5s])
+in parser.Call
+quantile_over_time(0.99, http_requests[5s])
+e.Func.Name = quantile_over_time
+e.Args = 0.99, http_requests[5s]
+a.(*parser.MatrixSelector) = http_requests[5s]
+in *evaluator eval()
+0.99
+in *evaluator eval()
+0.99
+in *evaluator rangeEval
+[]
+******** in rangeEval: Timestamp **********
+8000 8000 1
+sel = http_requests[5s]
+sel.Range = 5s
+selVS = http_requests
+offset = 0
+stepRange = 5000
+ev.intelval = 1
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[542105679045456123:[2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000]] 14628192197171500314:[2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000]]]
+8000 8000
+in parser.Call inner
+mint maxt points
+before: 3000 8000 [2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000]]
+after: 3000 8000 [7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000] 690.9707741100068 @[8000]]
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[542105679045456123:[7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000] 690.9707741100068 @[8000]] 14628192197171500314:[2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000]]]
+8000 8000
+in parser.Call inner
+mint maxt points
+before: 3000 8000 [2498.164756990011 @[2000] 7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000]]
+after: 3000 8000 [7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000] 690.9707741100068 @[8000]]
+******** in rangeEval: Timestamp **********
+8000 8000 1
+************* Engine exec() ***********
+Engine Exec(): q =  sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *Engine execEvalStmt
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator eval()
+sum by(instance) (quantile_over_time(0.99, http_requests[5s]))
+in *evaluator rangeEval
+[<nil> quantile_over_time(0.99, http_requests[5s])]
+in *evaluator eval()
+quantile_over_time(0.99, http_requests[5s])
+in parser.Call
+quantile_over_time(0.99, http_requests[5s])
+e.Func.Name = quantile_over_time
+e.Args = 0.99, http_requests[5s]
+a.(*parser.MatrixSelector) = http_requests[5s]
+in *evaluator eval()
+0.99
+in *evaluator eval()
+0.99
+in *evaluator rangeEval
+[]
+******** in rangeEval: Timestamp **********
+9000 9000 1
+sel = http_requests[5s]
+sel.Range = 5s
+selVS = http_requests
+offset = 0
+stepRange = 5000
+ev.intelval = 1
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="0", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[542105679045456123:[7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000] 690.9707741100068 @[8000]] 14628192197171500314:[7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000] 690.9707741100068 @[8000]]]
+9000 9000
+in parser.Call inner
+mint maxt points
+before: 4000 9000 [7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000] 690.9707741100068 @[8000]]
+after: 4000 9000 [6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000] 690.9707741100068 @[8000] 5185.246294726522 @[9000]]
+selVS.Series[i] = &{{__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"} 0x9ed040}
+selVS.Series[i].Labels() = {__name__="http_requests", group="canary", instance="1", job="app-server", severity="overwrite-me"}
+getPointSliceSeries:  map[542105679045456123:[6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000] 690.9707741100068 @[8000] 5185.246294726522 @[9000]] 14628192197171500314:[7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000] 690.9707741100068 @[8000]]]
+9000 9000
+in parser.Call inner
+mint maxt points
+before: 4000 9000 [7012.729970342356 @[3000] 6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000] 690.9707741100068 @[8000]]
+after: 4000 9000 [6750.415878511812 @[4000] 8991.65581383279 @[5000] 6632.763079864684 @[6000] 9507.567616553335 @[7000] 690.9707741100068 @[8000] 5185.246294726522 @[9000]]
+******** in rangeEval: Timestamp **********
+9000 9000 1
+--- PASS: TestRuleEvalPressure (0.05s)
+PASS
+ok  	github.com/prometheus/prometheus/rules	0.087s

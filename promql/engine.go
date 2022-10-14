@@ -1401,7 +1401,7 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 				fmt.Println("in parser.Call inner")
 				fmt.Println("mint maxt points")
 				fmt.Println("before:", mint, maxt, points_metric[selVS.Series[i].Labels().Hash()])
-				points_metric[selVS.Series[i].Labels().Hash()] = ev.matrixIterSlice(it, mint, maxt, points_metric[selVS.Series[i].Labels().Hash()]) // sliding window, but points are always []
+				points_metric[selVS.Series[i].Labels().Hash()] = ev.matrixIterSliceSeries(it, mint, maxt, points_metric[selVS.Series[i].Labels().Hash()]) // sliding window, but points are always []
 				fmt.Println("after:", mint, maxt, points_metric[selVS.Series[i].Labels().Hash()])
 				if len(points_metric[selVS.Series[i].Labels().Hash()]) == 0 {
 					continue
@@ -1429,7 +1429,8 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 			}
 
 			ev.currentSamples -= len(points_metric[selVS.Series[i].Labels().Hash()])
-			putPointSliceSeries(selVS.Series[i].Labels(), points_metric[selVS.Series[i].Labels().Hash()])
+			/* Modified by Zeying */
+			setPointSliceSeries(selVS.Series[i].Labels(), points_metric[selVS.Series[i].Labels().Hash()])
 		}
 
 		// The absent_over_time function returns 0 or 1 series. So far, the matrix
@@ -1734,30 +1735,41 @@ func (ev *evaluator) vectorSelectorSingle(it *storage.MemoizedSeriesIterator, no
 	return t, v, true
 }
 
-var pointPools_series = make(map[uint64](sync.Pool{}))
+// var pointPools_series = make(map[uint64](sync.Pool{}))
+var pointPools_series = make(map[uint64]([]Point))
 
 func getPointSliceSeries(metric labels.Labels, sz int) []Point {
 	h := metric.Hash()
-	p := pointPools_series[h].Get()
+	p := pointPools_series[h]
+	fmt.Println("getPointSliceSeries: ", pointPools_series)
 	if p != nil {
-		return p.([]Point)
+		return p
 	}
 	return make([]Point, 0, sz)
 }
 
+/*
 func putPointSliceSeries(metric labels.Labels, p []Point) {
 	//nolint:staticcheck // Ignore SA6002 relax staticcheck verification.
 	h := metric.Hash()
-	pointPools_series[h].Put(p[:0])
+	pointPools_series[h] = append(pointPools_series[h], p...)
+}
+*/
+
+func setPointSliceSeries(metric labels.Labels, p []Point) {
+	//nolint:staticcheck // Ignore SA6002 relax staticcheck verification.
+	h := metric.Hash()
+	pointPools_series[h] = p
 }
 
-var pointPools_result = make(map[uint64](sync.Pool{}))
+// var pointPools_result = make(map[uint64](sync.Pool{}))
+var pointPools_result = make(map[uint64]([]Point))
 
 func getPointSliceResult(metric labels.Labels, sz int) []Point {
 	h := metric.Hash()
-	p := pointPools_result[h].Get()
+	p := pointPools_result[h]
 	if p != nil {
-		return p.([]Point)
+		return p
 	}
 	return make([]Point, 0, sz)
 }
@@ -1765,7 +1777,7 @@ func getPointSliceResult(metric labels.Labels, sz int) []Point {
 func putPointSliceResult(metric labels.Labels, p []Point) {
 	//nolint:staticcheck // Ignore SA6002 relax staticcheck verification.
 	h := metric.Hash()
-	pointPools_result[h].Put(p[:0])
+	pointPools_result[h] = append(pointPools_result[h], p...)
 }
 
 // matrixSelector evaluates a *parser.MatrixSelector expression.
@@ -1815,6 +1827,70 @@ func (ev *evaluator) matrixSelector(node *parser.MatrixSelector) (Matrix, storag
 // into the [mint, maxt] range are retained; only points with later timestamps
 // are populated from the iterator.
 func (ev *evaluator) matrixIterSlice(it *storage.BufferedSeriesIterator, mint, maxt int64, out []Point) []Point {
+	if len(out) > 0 && out[len(out)-1].T >= mint {
+		// There is an overlap between previous and current ranges, retain common
+		// points. In most such cases:
+		//   (a) the overlap is significantly larger than the eval step; and/or
+		//   (b) the number of samples is relatively small.
+		// so a linear search will be as fast as a binary search.
+		var drop int
+		for drop = 0; out[drop].T < mint; drop++ {
+		}
+		ev.currentSamples -= drop
+		copy(out, out[drop:])
+		out = out[:len(out)-drop]
+		// Only append points with timestamps after the last timestamp we have.
+		mint = out[len(out)-1].T + 1
+	} else {
+		ev.currentSamples -= len(out)
+		out = out[:0]
+	}
+
+	ok := it.Seek(maxt)
+	if !ok {
+		if it.Err() != nil {
+			ev.error(it.Err())
+		}
+	}
+
+	buf := it.Buffer()
+	for buf.Next() {
+		t, v := buf.At()
+		if value.IsStaleNaN(v) {
+			continue
+		}
+		// Values in the buffer are guaranteed to be smaller than maxt.
+		if t >= mint {
+			if ev.currentSamples >= ev.maxSamples {
+				ev.error(ErrTooManySamples(env))
+			}
+			ev.currentSamples++
+			out = append(out, Point{T: t, V: v})
+		}
+	}
+	// The seeked sample might also be in the range.
+	if ok {
+		t, v := it.At()
+		if t >= mint && t == maxt && !value.IsStaleNaN(v) {
+			if ev.currentSamples >= ev.maxSamples {
+				ev.error(ErrTooManySamples(env))
+			}
+			out = append(out, Point{T: t, V: v})
+			ev.currentSamples++
+		}
+	}
+	return out
+}
+
+// matrixIterSliceSeries populates a matrix vector covering the requested range for a
+// single time series, with points retrieved from an iterator.
+//
+// As an optimization, the matrix vector may already contain points of the same
+// time series from the evaluation of an earlier step (with lower mint and maxt
+// values). Any such points falling before mint are discarded; points that fall
+// into the [mint, maxt] range are retained; only points with later timestamps
+// are populated from the iterator.
+func (ev *evaluator) matrixIterSliceSeries(it *storage.BufferedSeriesIterator, mint, maxt int64, out []Point) []Point {
 	if len(out) > 0 && out[len(out)-1].T >= mint {
 		// There is an overlap between previous and current ranges, retain common
 		// points. In most such cases:

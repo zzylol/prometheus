@@ -16,10 +16,10 @@ package rules
 import (
 	// "context"
 	// "html/template"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
-	"path/filepath"
-	"os"
 
 	"github.com/stretchr/testify/require"
 
@@ -33,7 +33,7 @@ import (
 
 /*
 func TestRuleEval(t *testing.T) {
-	t.Log("Hi! in TestRuleEval!")	
+	t.Log("Hi! in TestRuleEval!")
 
 	storage := teststorage.New(t)
 	defer storage.Close()
@@ -105,24 +105,22 @@ func newTestFromFile(t testutil.T, filename string) (*promql.Test, error) {
 func TestRuleEvalPressure(t *testing.T) {
 	t.Log("Hi! in TestRuleEvalPressure!")
 	files, err := filepath.Glob("testdata/*.test")
-	require.NoError(t, err)	
+	require.NoError(t, err)
 	fn := files[0]
 	suite, err := newTestFromFile(t, fn)
 	require.NoError(t, err)
 	defer suite.Close()
 
-	err = suite.Run() // just load data 
+	err = suite.Run() // just load data
 	require.NoError(t, err)
 
 	// quantile_over_time (range query)
-	expr, err := parser.ParseExpr(`sum by(instance) (quantile_over_time(0.99, http_requests[10s]))`)
+	expr, err := parser.ParseExpr(`sum by(instance) (quantile_over_time(0.99, http_requests[5s]))`)
 	// avg_over_time (range query)
 	// expr, err := parser.ParseExpr(`sum by(instance) (avg_over_time(http_requests[900s]))`)
 	// Entropy (instant query)
 	// expr, err := parser.ParseExpr(`(http_requests * ln(http_requests))`)
 	require.NoError(t, err)
-
-
 
 	tests := []struct {
 		name   string
@@ -139,22 +137,20 @@ func TestRuleEvalPressure(t *testing.T) {
 	for _, test := range tests {
 		test.expr = expr
 		rule := NewRecordingRule(test.name, test.expr, test.labels)
-		for i := 1; i < 10001; i++ { // recording rule evaluated per second
+		for i := 1; i < 10; i++ { // recording rule evaluated per second
 			evalTime := time.Unix((int64)(i), 0)
 			_, _ = rule.Eval(suite.Context(), evalTime, EngineQueryFunc(suite.QueryEngine(), suite.Storage()), nil, 0) // no limit here
 			/*
-			start_time := time.Now()
-			result, _ := rule.Eval(suite.Context(), evalTime, EngineQueryFunc(suite.QueryEngine(), suite.Storage()), nil, 0) // no limit here
-			elapsed := time.Since(start_time)
-			t.Log("Eval time used is:", elapsed)
-			t.Log("Eval result is:\n", result)
+				start_time := time.Now()
+				result, _ := rule.Eval(suite.Context(), evalTime, EngineQueryFunc(suite.QueryEngine(), suite.Storage()), nil, 0) // no limit here
+				elapsed := time.Since(start_time)
+				t.Log("Eval time used is:", elapsed)
+				t.Log("Eval result is:\n", result)
 			*/
 		}
-		
+
 	}
 }
-
-
 
 /*
 
