@@ -115,7 +115,7 @@ func TestRuleEvalPressure(t *testing.T) {
 	require.NoError(t, err)
 
 	// quantile_over_time (range query)
-	expr, err := parser.ParseExpr(`sum by(instance) (quantile_over_time(0.99, http_requests[5s]))`)
+	expr, err := parser.ParseExpr(`sum by(instance) (quantile_over_time(0.99, http_requests[900s]))`)
 	// avg_over_time (range query)
 	// expr, err := parser.ParseExpr(`sum by(instance) (avg_over_time(http_requests[900s]))`)
 	// Entropy (instant query)
@@ -137,16 +137,16 @@ func TestRuleEvalPressure(t *testing.T) {
 	for _, test := range tests {
 		test.expr = expr
 		rule := NewRecordingRule(test.name, test.expr, test.labels)
-		for i := 1; i < 10; i++ { // recording rule evaluated per second
+		for i := 1; i < 3; i++ { // recording rule evaluated per second
 			evalTime := time.Unix((int64)(i), 0)
 			_, _ = rule.Eval(suite.Context(), evalTime, EngineQueryFunc(suite.QueryEngine(), suite.Storage()), nil, 0) // no limit here
-			/*
-				start_time := time.Now()
-				result, _ := rule.Eval(suite.Context(), evalTime, EngineQueryFunc(suite.QueryEngine(), suite.Storage()), nil, 0) // no limit here
-				elapsed := time.Since(start_time)
-				t.Log("Eval time used is:", elapsed)
-				t.Log("Eval result is:\n", result)
-			*/
+
+			start_time := time.Now()
+			result, _ := rule.Eval(suite.Context(), evalTime, EngineQueryFunc(suite.QueryEngine(), suite.Storage()), nil, 0) // no limit here
+			elapsed := time.Since(start_time)
+			t.Log("Eval time used is:", elapsed)
+			t.Log("Eval result is:\n", result)
+
 		}
 
 	}

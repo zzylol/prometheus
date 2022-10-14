@@ -57,6 +57,8 @@ const (
 	minInt64 = -9223372036854775808
 )
 
+var debug = 0
+
 type engineMetrics struct {
 	currentQueries       prometheus.Gauge
 	maxConcurrentQueries prometheus.Gauge
@@ -508,7 +510,9 @@ func (ng *Engine) exec(ctx context.Context, q *query) (v parser.Value, ws storag
 
 	ctx, cancel := context.WithTimeout(ctx, ng.timeout)
 	q.cancel = cancel
-	fmt.Println("************* Engine exec() ***********")
+	if debug == 1 {
+		fmt.Println("************* Engine exec() ***********")
+	}
 
 	defer func() {
 		ng.queryLoggerLock.RLock()
@@ -522,7 +526,9 @@ func (ng *Engine) exec(ctx context.Context, q *query) (v parser.Value, ws storag
 				params["step"] = int64(eq.Interval / (time.Second / time.Nanosecond))
 			}
 
-			fmt.Println(params)
+			if debug == 1 {
+				fmt.Println(params)
+			}
 
 			f := []interface{}{"params", params}
 			if err != nil {
@@ -572,7 +578,9 @@ func (ng *Engine) exec(ctx context.Context, q *query) (v parser.Value, ws storag
 		return nil, nil, err
 	}
 
-	fmt.Println("Engine Exec(): q = ", q)
+	if debug == 1 {
+		fmt.Println("Engine Exec(): q = ", q)
+	}
 
 	switch s := q.Statement().(type) {
 	case *parser.EvalStmt:
@@ -624,8 +632,11 @@ func (ng *Engine) execEvalStmt(ctx context.Context, query *query, s *parser.Eval
 			noStepSubqueryIntervalFn: ng.noStepSubqueryIntervalFn,
 		}
 
-		fmt.Println("in *Engine execEvalStmt")
-		fmt.Println(s.Expr)
+		if debug == 1 {
+			fmt.Println("in *Engine execEvalStmt")
+			fmt.Println(s.Expr)
+		}
+
 		val, warnings, err := evaluator.Eval(s.Expr)
 		if err != nil {
 			return nil, warnings, err
@@ -1007,8 +1018,11 @@ func (ev *evaluator) rangeEval(prepSeries func(labels.Labels, *EvalSeriesHelper)
 	origMatrixes := make([]Matrix, len(exprs))
 	originalNumSamples := ev.currentSamples
 
-	fmt.Println("in *evaluator rangeEval")
-	fmt.Println(exprs)
+	if debug == 1 {
+		fmt.Println("in *evaluator rangeEval")
+		fmt.Println(exprs)
+	}
+
 	var warnings storage.Warnings
 	for i, e := range exprs {
 		// Functions will take string arguments from the expressions, not the values.
@@ -1063,8 +1077,11 @@ func (ev *evaluator) rangeEval(prepSeries func(labels.Labels, *EvalSeriesHelper)
 		}
 	}
 
-	fmt.Println("******** in rangeEval: Timestamp **********")
-	fmt.Println(ev.startTimestamp, ev.endTimestamp, ev.interval)
+	if debug == 1 {
+		fmt.Println("******** in rangeEval: Timestamp **********")
+		fmt.Println(ev.startTimestamp, ev.endTimestamp, ev.interval)
+	}
+
 	for ts := ev.startTimestamp; ts <= ev.endTimestamp; ts += ev.interval {
 		if err := contextDone(ev.ctx, "expression evaluation"); err != nil {
 			ev.error(err)
@@ -1205,8 +1222,10 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 	ev.ctx = ctxWithSpan
 	defer span.End()
 
-	fmt.Println("in *evaluator eval()")
-	fmt.Println(expr)
+	if debug == 1 {
+		fmt.Println("in *evaluator eval()")
+		fmt.Println(expr)
+	}
 
 	switch e := expr.(type) {
 	case *parser.AggregateExpr:
@@ -1240,8 +1259,10 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 	case *parser.Call:
 		call := FunctionCalls[e.Func.Name]
 
-		fmt.Println("in parser.Call")
-		fmt.Println(e)
+		if debug == 1 {
+			fmt.Println("in parser.Call")
+			fmt.Println(e)
+		}
 
 		if e.Func.Name == "timestamp" {
 			// Matrix evaluation always returns the evaluation time,
@@ -1271,22 +1292,30 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 			warnings       storage.Warnings
 		)
 
-		fmt.Println("e.Func.Name =", e.Func.Name) // e.g., quantile_over_time
-		fmt.Println("e.Args =", e.Args)           // e.g.,0.99, http_requests[10s] in quantile_over_time
+		if debug == 1 {
+			fmt.Println("e.Func.Name =", e.Func.Name) // e.g., quantile_over_time
+			fmt.Println("e.Args =", e.Args)           // e.g.,0.99, http_requests[10s] in quantile_over_time
+		}
 
 		for i := range e.Args {
 			unwrapParenExpr(&e.Args[i])
 			a := unwrapStepInvariantExpr(e.Args[i])
 			unwrapParenExpr(&a)
 			if _, ok := a.(*parser.MatrixSelector); ok {
-				fmt.Println("a.(*parser.MatrixSelector) =", a.(*parser.MatrixSelector)) // e.g., http_requests[10s] is a MatrixSelector
+				if debug == 1 {
+					fmt.Println("a.(*parser.MatrixSelector) =", a.(*parser.MatrixSelector)) // e.g., http_requests[10s] is a MatrixSelector
+				}
+
 				matrixArgIndex = i
 				matrixArg = true
 				break
 			}
 			// parser.SubqueryExpr can be used in place of parser.MatrixSelector.
 			if subq, ok := a.(*parser.SubqueryExpr); ok {
-				fmt.Println("subq =", subq)
+				if debug == 1 {
+					fmt.Println("subq =", subq)
+				}
+
 				matrixArgIndex = i
 				matrixArg = true
 				// Replacing parser.SubqueryExpr with parser.MatrixSelector.
@@ -1327,10 +1356,15 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 		arg := unwrapStepInvariantExpr(e.Args[matrixArgIndex])
 		unwrapParenExpr(&arg)
 		sel := arg.(*parser.MatrixSelector)
-		fmt.Println("sel =", sel)
-		fmt.Println("sel.Range =", sel.Range)                // e.g., 10s in http_requests[10s]
+		if debug == 1 {
+			fmt.Println("sel =", sel)
+			fmt.Println("sel.Range =", sel.Range) // e.g., 10s in http_requests[10s]
+		}
+
 		selVS := sel.VectorSelector.(*parser.VectorSelector) // type is *parser.VectorSelector
-		fmt.Println("selVS =", selVS)                        // e.g., http_requets
+		if debug == 1 {
+			fmt.Println("selVS =", selVS) // e.g., http_requets
+		}
 
 		ws, err := checkAndExpandSeriesSet(ev.ctx, sel)
 		warnings = append(warnings, ws...)
@@ -1339,11 +1373,17 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 		}
 		mat := make(Matrix, 0, len(selVS.Series)) // Output matrix.
 		offset := durationMilliseconds(selVS.Offset)
-		fmt.Println("offset =", offset)
+		if debug == 1 {
+			fmt.Println("offset =", offset)
+		}
+
 		selRange := durationMilliseconds(sel.Range) // e.g., 10s
 		stepRange := selRange
-		fmt.Println("stepRange =", stepRange)     // 10s * 1000 = 10,000 ms
-		fmt.Println("ev.intelval =", ev.interval) // 1
+		if debug == 1 {
+			fmt.Println("stepRange =", stepRange)     // 10s * 1000 = 10,000 ms
+			fmt.Println("ev.intelval =", ev.interval) // 1
+		}
+
 		if stepRange > ev.interval {
 			stepRange = ev.interval
 		}
@@ -1359,7 +1399,9 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 		// Process all the calls for one time series at a time.
 		it := storage.NewBuffer(selRange)
 		for i, s := range selVS.Series {
-			fmt.Println("selVS.Series[i] =", s) // e.g., http_requests metric has multiple serieses (different labels, instance = 0, instance = 1)
+			if debug == 1 {
+				fmt.Println("selVS.Series[i] =", s) // e.g., http_requests metric has multiple serieses (different labels, instance = 0, instance = 1)
+			}
 			/* Modified by Zeying */
 			ev.currentSamples -= len(points_metric[selVS.Series[i].Labels().Hash()])
 
@@ -1367,7 +1409,9 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 
 			it.Reset(s.Iterator())
 			metric := selVS.Series[i].Labels()
-			fmt.Println("selVS.Series[i].Labels() =", metric)
+			if debug == 1 {
+				fmt.Println("selVS.Series[i].Labels() =", metric)
+			}
 			// The last_over_time function acts like offset; thus, it
 			// should keep the metric name.  For all the other range
 			// vector functions, the only change needed is to drop the
@@ -1381,9 +1425,11 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 			}
 			inMatrix[0].Metric = selVS.Series[i].Labels()
 
-			points_metric[selVS.Series[i].Labels().Hash()] = getPointSliceSeries(selVS.Series[i].Labels(), 16)
+			points_metric[selVS.Series[i].Labels().Hash()] = getPointSliceSeries(selVS.Series[i].Labels(), 0)
 
-			fmt.Println(ev.startTimestamp, ev.endTimestamp)
+			if debug == 1 {
+				fmt.Println(ev.startTimestamp, ev.endTimestamp)
+			}
 
 			for ts, step := ev.startTimestamp, -1; ts <= ev.endTimestamp; ts += ev.interval {
 				step++
@@ -1398,11 +1444,17 @@ func (ev *evaluator) eval(expr parser.Expr) (parser.Value, storage.Warnings) {
 				maxt := ts - offset
 				mint := maxt - selRange
 				// Evaluate the matrix selector for this series for this step.
-				fmt.Println("in parser.Call inner")
-				fmt.Println("mint maxt points")
-				fmt.Println("before:", mint, maxt, points_metric[selVS.Series[i].Labels().Hash()])
+				if debug == 1 {
+					fmt.Println("in parser.Call inner")
+					fmt.Println("mint maxt points")
+					fmt.Println("before:", mint, maxt, points_metric[selVS.Series[i].Labels().Hash()])
+				}
+
 				points_metric[selVS.Series[i].Labels().Hash()] = ev.matrixIterSliceSeries(it, mint, maxt, points_metric[selVS.Series[i].Labels().Hash()]) // sliding window, but points are always []
-				fmt.Println("after:", mint, maxt, points_metric[selVS.Series[i].Labels().Hash()])
+				if debug == 1 {
+					fmt.Println("after:", mint, maxt, points_metric[selVS.Series[i].Labels().Hash()])
+				}
+
 				if len(points_metric[selVS.Series[i].Labels().Hash()]) == 0 {
 					continue
 				}
@@ -1741,7 +1793,9 @@ var pointPools_series = make(map[uint64]([]Point)) // TODO: check array memory u
 func getPointSliceSeries(metric labels.Labels, sz int) []Point {
 	h := metric.Hash()
 	p := pointPools_series[h]
-	fmt.Println("getPointSliceSeries: ", pointPools_series)
+	if debug == 1 {
+		fmt.Println("getPointSliceSeries: ", pointPools_series)
+	}
 	if p != nil {
 		return p
 	}
@@ -1774,7 +1828,7 @@ func getPointSliceResult(metric labels.Labels, sz int) []Point {
 	return make([]Point, 0, sz)
 }
 
-func putPointSliceResult(metric labels.Labels, p []Point) {
+func putPointSliceResult(metric labels.Labels, p []Point) { // TODO: check result pool correctness
 	//nolint:staticcheck // Ignore SA6002 relax staticcheck verification.
 	h := metric.Hash()
 	pointPools_result[h] = append(pointPools_result[h], p...)
