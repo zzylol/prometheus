@@ -10,7 +10,7 @@
     "@codemirror/highlight": "^0.19.6",
     "@codemirror/history": "^0.19.2",
     "@codemirror/language": "^0.19.7",
-    "@codemirror/lint": "^0.19.3",
+    "@codemirror/lint": "^6.1.0",
     "@codemirror/matchbrackets": "^0.19.3",
     "@codemirror/search": "^0.19.3",
     "@codemirror/state": "^0.19.6",
