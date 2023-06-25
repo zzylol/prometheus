@@ -102,6 +102,7 @@ func newTestFromFile(t testutil.T, filename string) (*promql.Test, error) {
 	return promql.NewTest(t, string(content))
 }
 
+// zeying added function
 func TestRuleEvalPressure(t *testing.T) {
 	t.Log("Hi! in TestRuleEvalPressure!")
 	files, err := filepath.Glob("testdata/*.test")
