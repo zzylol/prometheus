@@ -20,6 +20,7 @@ import (
 	"time"
 	"path/filepath"
 	"os"
+	"fmt"
 
 	"github.com/stretchr/testify/require"
 
@@ -115,7 +116,7 @@ func TestRuleEvalPressure(t *testing.T) {
 	err = suite.Run() // just load data 
 	require.NoError(t, err)
 
-	expr, err := parser.ParseExpr(`sum by(instance) (avg_over_time(http_requests[10s]))`)
+	expr, err := parser.ParseExpr(`sum by(instance) (max_over_time(http_requests[10000s]))`)
 	// `sum by(instance) (quantile_over_time(0.99, http_requests[10s]))`
 	require.NoError(t, err)
 
@@ -133,12 +134,18 @@ func TestRuleEvalPressure(t *testing.T) {
 		},
 	}
 
+	avg_eval_time := float64(0)
+	test_cases := float64(0)
 	for _, test := range tests {
 		test.expr = expr
 		rule := NewRecordingRule(test.name, test.expr, test.labels)
 		for i := 1; i < 10001; i++ { // recording rule evaluated per second
 			evalTime := time.Unix((int64)(i), 0)
+			start_time := time.Now()
 			_, _ = rule.Eval(suite.Context(), evalTime, EngineQueryFunc(suite.QueryEngine(), suite.Storage()), nil, 0) // no limit here
+			elapsed := time.Since(start_time)
+			avg_eval_time += float64(elapsed / time.Microsecond)
+			test_cases += 1
 			/*
 			start_time := time.Now()
 			result, _ := rule.Eval(suite.Context(), evalTime, EngineQueryFunc(suite.QueryEngine(), suite.Storage()), nil, 0) // no limit here
@@ -149,6 +156,7 @@ func TestRuleEvalPressure(t *testing.T) {
 		}
 		
 	}
+	fmt.Println("Avg Eval time (latency) (us):", avg_eval_time / test_cases)
 }
 
 
