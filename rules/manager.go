@@ -212,6 +212,37 @@ func EngineQueryFunc(engine *promql.Engine, q storage.Queryable) QueryFunc {
 	}
 }
 
+// QueryFuncSketch processes PromQL queries with sketch algorithms and interval query framework.
+type QueryFuncSketch func(ctx context.Context, q string, t time.Time) (promql.Vector, error)
+
+// EngineQueryFuncSketch returns a new query function that executes instant queries against
+// the given engine using sketch algorithms and interval query framework.
+// It converts scalar into vector results.
+func EngineQueryFuncSketch(engine *promql.Engine, q storage.Queryable) QueryFuncSketch {
+	return func(ctx context.Context, qs string, t time.Time) (promql.Vector, error) {
+		q, err := engine.NewInstantQuery(ctx, q, nil, qs, t) // TODO: change to interval query framework
+		if err != nil {
+			return nil, err
+		}
+		res := q.Exec(ctx)
+		if res.Err != nil {
+			return nil, res.Err
+		}
+		switch v := res.Value.(type) {
+		case promql.Vector:
+			return v, nil
+		case promql.Scalar:
+			return promql.Vector{promql.Sample{
+				T:      v.T,
+				F:      v.V,
+				Metric: labels.Labels{},
+			}}, nil
+		default:
+			return nil, errors.New("rule result is not a vector or scalar")
+		}
+	}
+}
+
 // A Rule encapsulates a vector expression which is evaluated at a specified
 // interval and acted upon (currently either recorded or used for alerting).
 type Rule interface {
@@ -221,7 +252,7 @@ type Rule interface {
 	// eval evaluates the rule, including any associated recording or alerting actions.
 	Eval(context.Context, time.Time, QueryFunc, *url.URL, int) (promql.Vector, error)
 	// evalSketch evaluates the rule, including any associated recording or alerting actions; with sketch algorithms
-	EvalSketch(context.Context, time.Time, QueryFunc, *url.URL, int) (promql.Vector, error)
+	EvalSketch(context.Context, time.Time, QueryFuncSketch, *url.URL, int) (promql.Vector, error)
 	// String returns a human-readable string representation of the rule.
 	String() string
 	// Query returns the rule query expression.
@@ -789,7 +820,7 @@ func (g *Group) EvalSketch(ctx context.Context, ts time.Time) {
 
 			g.metrics.EvalTotal.WithLabelValues(GroupKey(g.File(), g.Name())).Inc()
 
-			vector, err := rule.EvalSketch(ctx, ts, g.opts.QueryFunc, g.opts.ExternalURL, g.Limit())
+			vector, err := rule.EvalSketch(ctx, ts, g.opts.QueryFuncSketch, g.opts.ExternalURL, g.Limit())
 			if err != nil {
 				rule.SetHealth(HealthBad)
 				rule.SetLastError(err)
@@ -1094,6 +1125,7 @@ type NotifyFunc func(ctx context.Context, expr string, alerts ...*Alert)
 type ManagerOptions struct {
 	ExternalURL     *url.URL
 	QueryFunc       QueryFunc
+	QueryFuncSketch QueryFuncSketch
 	NotifyFunc      NotifyFunc
 	Context         context.Context
 	Appendable      storage.Appendable

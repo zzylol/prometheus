@@ -33,7 +33,7 @@ func (u unknownRule) Labels() labels.Labels { return labels.EmptyLabels() }
 func (u unknownRule) Eval(context.Context, time.Time, QueryFunc, *url.URL, int) (promql.Vector, error) {
 	return nil, nil
 }
-func (u unknownRule) EvalSketch(context.Context, time.Time, QueryFunc, *url.URL, int) (promql.Vector, error) {
+func (u unknownRule) EvalSketch(context.Context, time.Time, QueryFuncSketch, *url.URL, int) (promql.Vector, error) {
 	return nil, nil
 }
 func (u unknownRule) String() string                       { return "" }

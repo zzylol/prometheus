@@ -473,7 +473,7 @@ func (r *AlertingRule) Eval(ctx context.Context, ts time.Time, query QueryFunc, 
 
 // Eval evaluates the rule expression and then creates pending alerts and fires
 // or removes previously pending alerts accordingly.
-func (r *AlertingRule) EvalSketch(ctx context.Context, ts time.Time, query QueryFunc, externalURL *url.URL, limit int) (promql.Vector, error) {
+func (r *AlertingRule) EvalSketch(ctx context.Context, ts time.Time, query QueryFuncSketch, externalURL *url.URL, limit int) (promql.Vector, error) {
 	ctx = NewOriginContext(ctx, NewRuleDetail(r))
 
 	res, err := query(ctx, r.vector.String(), ts)

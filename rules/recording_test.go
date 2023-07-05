@@ -171,7 +171,7 @@ func BenchmarkRuleEvalSketch(b *testing.B) {
 			b.ResetTimer()
 
 			for i := 0; i < b.N; i++ {
-				_, err := rule.Eval(suite.Context(), ruleEvaluationTime, EngineQueryFunc(suite.QueryEngine(), suite.Storage()), nil, 0)
+				_, err := rule.EvalSketch(suite.Context(), ruleEvaluationTime, EngineQueryFuncSketch(suite.QueryEngine(), suite.Storage()), nil, 0)
 				if err != nil {
 					require.NoError(b, err)
 				}
