@@ -158,6 +158,28 @@ func BenchmarkRuleEval(b *testing.B) {
 	}
 }
 
+func BenchmarkRuleEvalSketch(b *testing.B) {
+	suite := setUpRuleEvalTest(b)
+	defer suite.Close()
+
+	require.NoError(b, suite.Run())
+
+	for _, scenario := range ruleEvalTestScenarios {
+		b.Run(scenario.name, func(b *testing.B) {
+			rule := NewRecordingRule("test_rule", scenario.expr, scenario.ruleLabels)
+
+			b.ResetTimer()
+
+			for i := 0; i < b.N; i++ {
+				_, err := rule.Eval(suite.Context(), ruleEvaluationTime, EngineQueryFunc(suite.QueryEngine(), suite.Storage()), nil, 0)
+				if err != nil {
+					require.NoError(b, err)
+				}
+			}
+		})
+	}
+}
+
 // TestRuleEvalDuplicate tests for duplicate labels in recorded metrics, see #5529.
 func TestRuleEvalDuplicate(t *testing.T) {
 	storage := teststorage.New(t)

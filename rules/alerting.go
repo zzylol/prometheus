@@ -471,6 +471,157 @@ func (r *AlertingRule) Eval(ctx context.Context, ts time.Time, query QueryFunc, 
 	return vec, nil
 }
 
+// Eval evaluates the rule expression and then creates pending alerts and fires
+// or removes previously pending alerts accordingly.
+func (r *AlertingRule) EvalSketch(ctx context.Context, ts time.Time, query QueryFunc, externalURL *url.URL, limit int) (promql.Vector, error) {
+	ctx = NewOriginContext(ctx, NewRuleDetail(r))
+
+	res, err := query(ctx, r.vector.String(), ts)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create pending alerts for any new vector elements in the alert expression
+	// or update the expression value for existing elements.
+	resultFPs := map[uint64]struct{}{}
+
+	var vec promql.Vector
+	alerts := make(map[uint64]*Alert, len(res))
+	for _, smpl := range res {
+		// Provide the alert information to the template.
+		l := smpl.Metric.Map()
+
+		tmplData := template.AlertTemplateData(l, r.externalLabels, r.externalURL, smpl.F)
+		// Inject some convenience variables that are easier to remember for users
+		// who are not used to Go's templating system.
+		defs := []string{
+			"{{$labels := .Labels}}",
+			"{{$externalLabels := .ExternalLabels}}",
+			"{{$externalURL := .ExternalURL}}",
+			"{{$value := .Value}}",
+		}
+
+		expand := func(text string) string {
+			tmpl := template.NewTemplateExpander(
+				ctx,
+				strings.Join(append(defs, text), ""),
+				"__alert_"+r.Name(),
+				tmplData,
+				model.Time(timestamp.FromTime(ts)),
+				template.QueryFunc(query),
+				externalURL,
+				nil,
+			)
+			result, err := tmpl.Expand()
+			if err != nil {
+				result = fmt.Sprintf("<error expanding template: %s>", err)
+				level.Warn(r.logger).Log("msg", "Expanding alert template failed", "err", err, "data", tmplData)
+			}
+			return result
+		}
+
+		lb := labels.NewBuilder(smpl.Metric).Del(labels.MetricName)
+
+		r.labels.Range(func(l labels.Label) {
+			lb.Set(l.Name, expand(l.Value))
+		})
+		lb.Set(labels.AlertName, r.Name())
+
+		sb := labels.ScratchBuilder{}
+		r.annotations.Range(func(a labels.Label) {
+			sb.Add(a.Name, expand(a.Value))
+		})
+		annotations := sb.Labels()
+
+		lbs := lb.Labels()
+		h := lbs.Hash()
+		resultFPs[h] = struct{}{}
+
+		if _, ok := alerts[h]; ok {
+			return nil, fmt.Errorf("vector contains metrics with the same labelset after applying alert labels")
+		}
+
+		alerts[h] = &Alert{
+			Labels:      lbs,
+			Annotations: annotations,
+			ActiveAt:    ts,
+			State:       StatePending,
+			Value:       smpl.F,
+		}
+	}
+
+	r.activeMtx.Lock()
+	defer r.activeMtx.Unlock()
+
+	for h, a := range alerts {
+		// Check whether we already have alerting state for the identifying label set.
+		// Update the last value and annotations if so, create a new alert entry otherwise.
+		if alert, ok := r.active[h]; ok && alert.State != StateInactive {
+			alert.Value = a.Value
+			alert.Annotations = a.Annotations
+			continue
+		}
+
+		r.active[h] = a
+	}
+
+	var numActivePending int
+	// Check if any pending alerts should be removed or fire now. Write out alert timeseries.
+	for fp, a := range r.active {
+		if _, ok := resultFPs[fp]; !ok {
+			// There is no firing alerts for this fingerprint. The alert is no
+			// longer firing.
+
+			// Use keepFiringFor value to determine if the alert should keep
+			// firing.
+			var keepFiring bool
+			if a.State == StateFiring && r.keepFiringFor > 0 {
+				if a.KeepFiringSince.IsZero() {
+					a.KeepFiringSince = ts
+				}
+				if ts.Sub(a.KeepFiringSince) < r.keepFiringFor {
+					keepFiring = true
+				}
+			}
+
+			// If the alert was previously firing, keep it around for a given
+			// retention time so it is reported as resolved to the AlertManager.
+			if a.State == StatePending || (!a.ResolvedAt.IsZero() && ts.Sub(a.ResolvedAt) > resolvedRetention) {
+				delete(r.active, fp)
+			}
+			if a.State != StateInactive && !keepFiring {
+				a.State = StateInactive
+				a.ResolvedAt = ts
+			}
+			if !keepFiring {
+				continue
+			}
+		} else {
+			// The alert is firing, reset keepFiringSince.
+			a.KeepFiringSince = time.Time{}
+		}
+		numActivePending++
+
+		if a.State == StatePending && ts.Sub(a.ActiveAt) >= r.holdDuration {
+			a.State = StateFiring
+			a.FiredAt = ts
+		}
+
+		if r.restored.Load() {
+			vec = append(vec, r.sample(a, ts))
+			vec = append(vec, r.forStateSample(a, ts, float64(a.ActiveAt.Unix())))
+		}
+	}
+
+	if limit > 0 && numActivePending > limit {
+		r.active = map[uint64]*Alert{}
+		return nil, fmt.Errorf("exceeded limit of %d with %d alerts", limit, numActivePending)
+	}
+
+	return vec, nil
+}
+
+
 // State returns the maximum state of alert instances for this rule.
 // StateFiring > StatePending > StateInactive
 func (r *AlertingRule) State() AlertState {
