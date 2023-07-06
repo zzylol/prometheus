@@ -304,6 +304,10 @@ type Group struct {
 	// Rule group evaluation iteration function,
 	// defaults to DefaultEvalIterationFunc.
 	evalIterationFunc GroupEvalIterationFunc
+
+	// Sketch-based Rule group evaluation iteration function,
+	// defaults to DefaultEvalIterationFunc.
+	evalIterationFuncSketch GroupEvalIterationFuncSketch
 }
 
 // GroupEvalIterationFunc is used to implement and extend rule group
@@ -313,15 +317,23 @@ type Group struct {
 // DefaultEvalIterationFunc is the default implementation.
 type GroupEvalIterationFunc func(ctx context.Context, g *Group, evalTimestamp time.Time)
 
+// GroupEvalIterationFuncSketch is used to implement and extend rule group
+// evaluation iteration logic. It is configured in Group.evalIterationFunc,
+// and periodically invoked at each group evaluation interval to
+// evaluate the rules in the group at that point in time.
+// DefaultEvalIterationFunc is the default implementation.
+type GroupEvalIterationFuncSketch func(ctx context.Context, g *Group, evalTimestamp time.Time)
+
 type GroupOptions struct {
-	Name, File        string
-	Interval          time.Duration
-	Limit             int
-	Rules             []Rule
-	ShouldRestore     bool
-	Opts              *ManagerOptions
-	done              chan struct{}
-	EvalIterationFunc GroupEvalIterationFunc
+	Name, File       		string
+	Interval          		time.Duration
+	Limit             		int
+	Rules             		[]Rule
+	ShouldRestore     		bool
+	Opts              		*ManagerOptions
+	done              		chan struct{}
+	EvalIterationFunc 		GroupEvalIterationFunc
+	EvalIterationFuncSketch GroupEvalIterationFuncSketch
 }
 
 // NewGroup makes a new Group with the given name, options, and rules.
@@ -491,6 +503,25 @@ func DefaultEvalIterationFunc(ctx context.Context, g *Group, evalTimestamp time.
 
 	start := time.Now()
 	g.Eval(ctx, evalTimestamp)
+	timeSinceStart := time.Since(start)
+
+	g.metrics.IterationDuration.Observe(timeSinceStart.Seconds())
+	g.setEvaluationTime(timeSinceStart)
+	g.setLastEvaluation(start)
+	g.setLastEvalTimestamp(evalTimestamp)
+}
+
+// DefaultEvalIterationFuncSketch is the default implementation of
+// GroupEvalIterationFuncSketch that is invoked once to evaluate the rules (periodically evaluate internally in the rules)
+// in a group at a given point in time and updates Group state and metrics
+// accordingly. Custom GroupEvalIterationFunc implementations are recommended
+// to invoke this function as well, to ensure correct Group state and metrics
+// are maintained.
+func DefaultEvalIterationFuncSketch(ctx context.Context, g *Group, evalTimestamp time.Time) {
+	g.metrics.IterationsScheduled.WithLabelValues(GroupKey(g.file, g.name)).Inc()
+
+	start := time.Now()
+	g.EvalSketch(ctx, evalTimestamp)
 	timeSinceStart := time.Since(start)
 
 	g.metrics.IterationDuration.Observe(timeSinceStart.Seconds())
@@ -1264,6 +1295,81 @@ func (m *Manager) Update(interval time.Duration, files []string, externalLabels 
 	return nil
 }
 
+
+// Update the rule manager's state as the config requires. If
+// loading the new rules failed the old rule set is restored.
+// for sketch interfaces
+func (m *Manager) UpdateSketch(interval time.Duration, files []string, externalLabels labels.Labels, externalURL string, groupEvalIterationFuncSketch GroupEvalIterationFuncSketch) error {
+	m.mtx.Lock()
+	defer m.mtx.Unlock()
+
+	groups, errs := m.LoadGroupsSketch(interval, externalLabels, externalURL, groupEvalIterationFuncSketch, files...)
+
+	if errs != nil {
+		for _, e := range errs {
+			level.Error(m.logger).Log("msg", "loading groups failed", "err", e)
+		}
+		return errors.New("error loading rules, previous rule set restored")
+	}
+	m.restored = true
+
+	var wg sync.WaitGroup
+	for _, newg := range groups {
+		// If there is an old group with the same identifier,
+		// check if new group equals with the old group, if yes then skip it.
+		// If not equals, stop it and wait for it to finish the current iteration.
+		// Then copy it into the new group.
+		gn := GroupKey(newg.file, newg.name)
+		oldg, ok := m.groups[gn]
+		delete(m.groups, gn)
+
+		if ok && oldg.Equals(newg) {
+			groups[gn] = oldg
+			continue
+		}
+
+		wg.Add(1)
+		go func(newg *Group) {
+			if ok {
+				oldg.stop()
+				newg.CopyState(oldg)
+			}
+			wg.Done()
+			// Wait with starting evaluation until the rule manager
+			// is told to run. This is necessary to avoid running
+			// queries against a bootstrapping storage.
+			<-m.block
+			newg.run(m.opts.Context)
+		}(newg)
+	}
+
+	// Stop remaining old groups.
+	wg.Add(len(m.groups))
+	for n, oldg := range m.groups {
+		go func(n string, g *Group) {
+			g.markStale = true
+			g.stop()
+			if m := g.metrics; m != nil {
+				m.IterationsMissed.DeleteLabelValues(n)
+				m.IterationsScheduled.DeleteLabelValues(n)
+				m.EvalTotal.DeleteLabelValues(n)
+				m.EvalFailures.DeleteLabelValues(n)
+				m.GroupInterval.DeleteLabelValues(n)
+				m.GroupLastEvalTime.DeleteLabelValues(n)
+				m.GroupLastDuration.DeleteLabelValues(n)
+				m.GroupRules.DeleteLabelValues(n)
+				m.GroupSamples.DeleteLabelValues((n))
+			}
+			wg.Done()
+		}(n, oldg)
+	}
+
+	wg.Wait()
+	m.groups = groups
+
+	return nil
+}
+
 // GroupLoader is responsible for loading rule groups from arbitrary sources and parsing them.
 type GroupLoader interface {
 	Load(identifier string) (*rulefmt.RuleGroups, []error)
@@ -1339,6 +1445,72 @@ func (m *Manager) LoadGroups(
 				Opts:              m.opts,
 				done:              m.done,
 				EvalIterationFunc: groupEvalIterationFunc,
+			})
+		}
+	}
+
+	return groups, nil
+}
+
+// LoadGroupsSketch reads groups from a list of files.
+func (m *Manager) LoadGroupsSketch(
+	interval time.Duration, externalLabels labels.Labels, externalURL string, groupEvalIterationFuncSketch GroupEvalIterationFuncSketch, filenames ...string,
+) (map[string]*Group, []error) {
+	groups := make(map[string]*Group)
+
+	shouldRestore := !m.restored
+
+	for _, fn := range filenames {
+		rgs, errs := m.opts.GroupLoader.Load(fn)
+		if errs != nil {
+			return nil, errs
+		}
+
+		for _, rg := range rgs.Groups {
+			itv := interval
+			if rg.Interval != 0 {
+				itv = time.Duration(rg.Interval)
+			}
+
+			rules := make([]Rule, 0, len(rg.Rules))
+			for _, r := range rg.Rules {
+				expr, err := m.opts.GroupLoader.Parse(r.Expr.Value)
+				if err != nil {
+					return nil, []error{fmt.Errorf("%s: %w", fn, err)}
+				}
+
+				if r.Alert.Value != "" {
+					rules = append(rules, NewAlertingRule(
+						r.Alert.Value,
+						expr,
+						time.Duration(r.For),
+						time.Duration(r.KeepFiringFor),
+						labels.FromMap(r.Labels),
+						labels.FromMap(r.Annotations),
+						externalLabels,
+						externalURL,
+						m.restored,
+						log.With(m.logger, "alert", r.Alert),
+					))
+					continue
+				}
+				rules = append(rules, NewRecordingRule(
+					r.Record.Value,
+					expr,
+					labels.FromMap(r.Labels),
+				))
+			}
+
+			groups[GroupKey(fn, rg.Name)] = NewGroup(GroupOptions{
+				Name:              rg.Name,
+				File:              fn,
+				Interval:          itv,
+				Limit:             rg.Limit,
+				Rules:             rules,
+				ShouldRestore:     shouldRestore,
+				Opts:              m.opts,
+				done:              m.done,
+				EvalIterationFuncSketch: groupEvalIterationFuncSketch,
 			})
 		}
 	}
