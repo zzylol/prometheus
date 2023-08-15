@@ -136,6 +136,22 @@ func TestRuleEval(t *testing.T) {
 	}
 }
 
+func TestRuleEvalSketch(t *testing.T) {
+	suite := setUpRuleEvalTest(t)
+	defer suite.Close()
+
+	require.NoError(t, suite.Run())
+
+	for _, scenario := range ruleEvalTestScenarios {
+		t.Run(scenario.name, func(t *testing.T) {
+			rule := NewRecordingRule("test_rule", scenario.expr, scenario.ruleLabels)
+			result, err := rule.EvalSketch(suite.Context(), ruleEvaluationTime, EngineQueryFuncSketch(suite.QueryEngine(), suite.Storage()), nil, 0)
+			require.NoError(t, err)
+			require.Equal(t, scenario.expected, result)
+		})
+	}
+}
+
 func BenchmarkRuleEval(b *testing.B) {
 	suite := setUpRuleEvalTest(b)
 	defer suite.Close()
