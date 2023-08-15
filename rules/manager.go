@@ -220,11 +220,11 @@ type QueryFuncSketch func(ctx context.Context, q string, t time.Time) (promql.Ve
 // It converts scalar into vector results.
 func EngineQueryFuncSketch(engine *promql.Engine, q storage.Queryable) QueryFuncSketch {
 	return func(ctx context.Context, qs string, t time.Time) (promql.Vector, error) {
-		q, err := engine.NewInstantQuery(ctx, q, nil, qs, t) // TODO: change to interval query framework
+		q, err := engine.NewInstantQuerySketch(ctx, q, nil, qs, t) // TODO: change to interval query framework
 		if err != nil {
 			return nil, err
 		}
-		res := q.Exec(ctx)
+		res := q.ExecSketch(ctx)
 		if res.Err != nil {
 			return nil, res.Err
 		}
@@ -325,14 +325,14 @@ type GroupEvalIterationFunc func(ctx context.Context, g *Group, evalTimestamp ti
 type GroupEvalIterationFuncSketch func(ctx context.Context, g *Group, evalTimestamp time.Time)
 
 type GroupOptions struct {
-	Name, File       		string
-	Interval          		time.Duration
-	Limit             		int
-	Rules             		[]Rule
-	ShouldRestore     		bool
-	Opts              		*ManagerOptions
-	done              		chan struct{}
-	EvalIterationFunc 		GroupEvalIterationFunc
+	Name, File              string
+	Interval                time.Duration
+	Limit                   int
+	Rules                   []Rule
+	ShouldRestore           bool
+	Opts                    *ManagerOptions
+	done                    chan struct{}
+	EvalIterationFunc       GroupEvalIterationFunc
 	EvalIterationFuncSketch GroupEvalIterationFuncSketch
 }
 
@@ -1295,7 +1295,6 @@ func (m *Manager) Update(interval time.Duration, files []string, externalLabels 
 	return nil
 }
 
-
 // Update the rule manager's state as the config requires. If
 // loading the new rules failed the old rule set is restored.
 // for sketch interfaces
@@ -1502,14 +1501,14 @@ func (m *Manager) LoadGroupsSketch(
 			}
 
 			groups[GroupKey(fn, rg.Name)] = NewGroup(GroupOptions{
-				Name:              rg.Name,
-				File:              fn,
-				Interval:          itv,
-				Limit:             rg.Limit,
-				Rules:             rules,
-				ShouldRestore:     shouldRestore,
-				Opts:              m.opts,
-				done:              m.done,
+				Name:                    rg.Name,
+				File:                    fn,
+				Interval:                itv,
+				Limit:                   rg.Limit,
+				Rules:                   rules,
+				ShouldRestore:           shouldRestore,
+				Opts:                    m.opts,
+				done:                    m.done,
 				EvalIterationFuncSketch: groupEvalIterationFuncSketch,
 			})
 		}

@@ -114,10 +114,10 @@ func (rule *RecordingRule) Eval(ctx context.Context, ts time.Time, query QueryFu
 
 // Eval evaluates the rule and then overrides the metric names and labels accordingly; calling Sketch API
 func (rule *RecordingRule) EvalSketch(ctx context.Context, ts time.Time, query QueryFuncSketch, _ *url.URL, limit int) (promql.Vector, error) {
-	fmt.Println("Recording: in EvalSketch!")
 	ctx = NewOriginContext(ctx, NewRuleDetail(rule))
 
 	vector, err := query(ctx, rule.vector.String(), ts)
+	fmt.Println("EvalSketch:", vector)
 	if err != nil {
 		return nil, err
 	}

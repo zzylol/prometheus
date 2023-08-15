@@ -118,6 +118,8 @@ type QueryLogger interface {
 type Query interface {
 	// Exec processes the query. Can only be called once.
 	Exec(ctx context.Context) *Result
+	// Exec processes the query. Can only be called once.
+	ExecSketch(ctx context.Context) *Result
 	// Close recovers memory used by the query result.
 	Close()
 	// Statement returns the parsed statement of the query.
@@ -227,6 +229,17 @@ func (q *query) Exec(ctx context.Context) *Result {
 
 	// Exec query.
 	res, warnings, err := q.ng.exec(ctx, q)
+	return &Result{Err: err, Value: res, Warnings: warnings}
+}
+
+// Exec implements the Query interface.
+func (q *query) ExecSketch(ctx context.Context) *Result {
+	if span := trace.SpanFromContext(ctx); span != nil {
+		span.SetAttributes(attribute.String(queryTag, q.stmt.String()))
+	}
+
+	// Exec query.
+	res, warnings, err := q.ng.execSketch(ctx, q)
 	return &Result{Err: err, Value: res, Warnings: warnings}
 }
 
@@ -451,6 +464,26 @@ func (ng *Engine) NewInstantQuery(ctx context.Context, q storage.Queryable, opts
 	return qry, nil
 }
 
+// NewInstantQuerySketch returns an evaluation query with sketch data structures for the given expression at the given time.
+func (ng *Engine) NewInstantQuerySketch(ctx context.Context, q storage.Queryable, opts QueryOpts, qs string, ts time.Time) (Query, error) {
+	pExpr, qry := ng.newQuery(q, qs, opts, ts, ts, 0)
+	finishQueue, err := ng.queueActive(ctx, qry)
+	if err != nil {
+		return nil, err
+	}
+	defer finishQueue()
+	expr, err := parser.ParseExpr(qs)
+	if err != nil {
+		return nil, err
+	}
+	if err := ng.validateOpts(expr); err != nil {
+		return nil, err
+	}
+	*pExpr = PreprocessExpr(expr, ts, ts)
+
+	return qry, nil
+}
+
 // NewRangeQuery returns an evaluation query for the given time range and with
 // the resolution set by the interval.
 func (ng *Engine) NewRangeQuery(ctx context.Context, q storage.Queryable, opts QueryOpts, qs string, start, end time.Time, interval time.Duration) (Query, error) {
@@ -574,6 +607,82 @@ func (ng *Engine) newTestQuery(f func(context.Context) error) Query {
 // At this point per query only one EvalStmt is evaluated. Alert and record
 // statements are not handled by the Engine.
 func (ng *Engine) exec(ctx context.Context, q *query) (v parser.Value, ws storage.Warnings, err error) {
+	ng.metrics.currentQueries.Inc()
+	defer func() {
+		ng.metrics.currentQueries.Dec()
+		ng.metrics.querySamples.Add(float64(q.sampleStats.TotalSamples))
+	}()
+
+	ctx, cancel := context.WithTimeout(ctx, ng.timeout)
+	q.cancel = cancel
+
+	defer func() {
+		ng.queryLoggerLock.RLock()
+		if l := ng.queryLogger; l != nil {
+			params := make(map[string]interface{}, 4)
+			params["query"] = q.q
+			if eq, ok := q.Statement().(*parser.EvalStmt); ok {
+				params["start"] = formatDate(eq.Start)
+				params["end"] = formatDate(eq.End)
+				// The step provided by the user is in seconds.
+				params["step"] = int64(eq.Interval / (time.Second / time.Nanosecond))
+			}
+			f := []interface{}{"params", params}
+			if err != nil {
+				f = append(f, "error", err)
+			}
+			f = append(f, "stats", stats.NewQueryStats(q.Stats()))
+			if span := trace.SpanFromContext(ctx); span != nil {
+				f = append(f, "spanID", span.SpanContext().SpanID())
+			}
+			if origin := ctx.Value(QueryOrigin{}); origin != nil {
+				for k, v := range origin.(map[string]interface{}) {
+					f = append(f, k, v)
+				}
+			}
+			if err := l.Log(f...); err != nil {
+				ng.metrics.queryLogFailures.Inc()
+				level.Error(ng.logger).Log("msg", "can't log query", "err", err)
+			}
+		}
+		ng.queryLoggerLock.RUnlock()
+	}()
+
+	execSpanTimer, ctx := q.stats.GetSpanTimer(ctx, stats.ExecTotalTime)
+	defer execSpanTimer.Finish()
+
+	finishQueue, err := ng.queueActive(ctx, q)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer finishQueue()
+
+	// Cancel when execution is done or an error was raised.
+	defer q.cancel()
+
+	evalSpanTimer, ctx := q.stats.GetSpanTimer(ctx, stats.EvalTotalTime)
+	defer evalSpanTimer.Finish()
+
+	// The base context might already be canceled on the first iteration (e.g. during shutdown).
+	if err := contextDone(ctx, env); err != nil {
+		return nil, nil, err
+	}
+
+	switch s := q.Statement().(type) {
+	case *parser.EvalStmt:
+		return ng.execEvalStmt(ctx, q, s)
+	case parser.TestStmt:
+		return nil, nil, s(ctx)
+	}
+
+	panic(fmt.Errorf("promql.Engine.exec: unhandled statement of type %T", q.Statement()))
+}
+
+// exec executes the query with sketch data structures.
+//
+// At this point per query only one EvalStmt is evaluated. Alert and record
+// statements are not handled by the Engine.
+func (ng *Engine) execSketch(ctx context.Context, q *query) (v parser.Value, ws storage.Warnings, err error) {
 	ng.metrics.currentQueries.Inc()
 	defer func() {
 		ng.metrics.currentQueries.Dec()
