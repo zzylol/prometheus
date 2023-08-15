@@ -74,6 +74,11 @@ var Functions = map[string]*Function{
 		ArgTypes:   []ValueType{ValueTypeMatrix},
 		ReturnType: ValueTypeVector,
 	},
+	"avg_over_time_sketch": {
+		Name:       "avg_over_time_sketch",
+		ArgTypes:   []ValueType{ValueTypeMatrix},
+		ReturnType: ValueTypeVector,
+	},
 	"ceil": {
 		Name:       "ceil",
 		ArgTypes:   []ValueType{ValueTypeVector},
@@ -111,6 +116,11 @@ var Functions = map[string]*Function{
 	},
 	"count_over_time": {
 		Name:       "count_over_time",
+		ArgTypes:   []ValueType{ValueTypeMatrix},
+		ReturnType: ValueTypeVector,
+	},
+	"count_over_time_sketch": {
+		Name:       "count_over_time_sketch",
 		ArgTypes:   []ValueType{ValueTypeMatrix},
 		ReturnType: ValueTypeVector,
 	},
@@ -282,6 +292,11 @@ var Functions = map[string]*Function{
 		ArgTypes:   []ValueType{ValueTypeScalar, ValueTypeMatrix},
 		ReturnType: ValueTypeVector,
 	},
+	"quantile_over_time_sketch": {
+		Name:       "quantile_over_time_sketch",
+		ArgTypes:   []ValueType{ValueTypeScalar, ValueTypeMatrix},
+		ReturnType: ValueTypeVector,
+	},
 	"rad": {
 		Name:       "rad",
 		ArgTypes:   []ValueType{ValueTypeVector},
@@ -350,6 +365,11 @@ var Functions = map[string]*Function{
 	},
 	"sum_over_time": {
 		Name:       "sum_over_time",
+		ArgTypes:   []ValueType{ValueTypeMatrix},
+		ReturnType: ValueTypeVector,
+	},
+	"sum_over_time_sketch": {
+		Name:       "sum_over_time_sketch",
 		ArgTypes:   []ValueType{ValueTypeMatrix},
 		ReturnType: ValueTypeVector,
 	},

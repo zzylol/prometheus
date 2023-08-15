@@ -585,6 +585,11 @@ over time and return an instant vector with per-series aggregation results:
 * `stdvar_over_time(range-vector)`: the population standard variance of the values in the specified interval.
 * `last_over_time(range-vector)`: the most recent point value in the specified interval.
 * `present_over_time(range-vector)`: the value 1 for any series in the specified interval.
+* `avg_over_time_sketch(range-vector)`: the average value of all points in the specified interval.
+* `count_over_time_sketch(range-vector)`: the count of all values in the specified interval.
+* `sum_over_time_sketch(range-vector)`: the sum of all values in the specified interval.
+* `quantile_over_time_sketch(scalar, range-vector)`: the φ-quantile (0 ≤ φ ≤ 1) of the values in the specified interval.
+
 
 Note that all values in the specified interval have the same weight in the
 aggregation even if the values are not equally spaced throughout the interval.

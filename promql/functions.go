@@ -508,8 +508,74 @@ func funcAvgOverTime(vals []parser.Value, args parser.Expressions, enh *EvalNode
 	})
 }
 
+// === avg_over_time(Matrix parser.ValueTypeMatrix) Vector ===
+func funcAvgOverTimeSketch(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
+	if len(vals[0].(Matrix)[0].Floats) > 0 && len(vals[0].(Matrix)[0].Histograms) > 0 {
+		// TODO(zenador): Add warning for mixed floats and histograms.
+		return enh.Out
+	}
+	if len(vals[0].(Matrix)[0].Floats) == 0 {
+		// The passed values only contain histograms.
+		return aggrHistOverTime(vals, enh, func(s Series) *histogram.FloatHistogram {
+			count := 1
+			mean := s.Histograms[0].H.Copy()
+			for _, h := range s.Histograms[1:] {
+				count++
+				left := h.H.Copy().Div(float64(count))
+				right := mean.Copy().Div(float64(count))
+				// The histogram being added/subtracted must have
+				// an equal or larger schema.
+				if h.H.Schema >= mean.Schema {
+					toAdd := right.Mul(-1).Add(left)
+					mean.Add(toAdd)
+				} else {
+					toAdd := left.Sub(right)
+					mean = toAdd.Add(mean)
+				}
+			}
+			return mean
+		})
+	}
+	return aggrOverTime(vals, enh, func(s Series) float64 {
+		var mean, count, c float64
+		for _, f := range s.Floats {
+			count++
+			if math.IsInf(mean, 0) {
+				if math.IsInf(f.F, 0) && (mean > 0) == (f.F > 0) {
+					// The `mean` and `f.F` values are `Inf` of the same sign.  They
+					// can't be subtracted, but the value of `mean` is correct
+					// already.
+					continue
+				}
+				if !math.IsInf(f.F, 0) && !math.IsNaN(f.F) {
+					// At this stage, the mean is an infinite. If the added
+					// value is neither an Inf or a Nan, we can keep that mean
+					// value.
+					// This is required because our calculation below removes
+					// the mean value, which would look like Inf += x - Inf and
+					// end up as a NaN.
+					continue
+				}
+			}
+			mean, c = kahanSumInc(f.F/count-mean/count, mean, c)
+		}
+
+		if math.IsInf(mean, 0) {
+			return mean
+		}
+		return mean + c
+	})
+}
+
 // === count_over_time(Matrix parser.ValueTypeMatrix) Vector ===
 func funcCountOverTime(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
+	return aggrOverTime(vals, enh, func(s Series) float64 {
+		return float64(len(s.Floats) + len(s.Histograms))
+	})
+}
+
+// === count_over_time(Matrix parser.ValueTypeMatrix) Vector ===
+func funcCountOverTimeSketch(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
 	return aggrOverTime(vals, enh, func(s Series) float64 {
 		return float64(len(s.Floats) + len(s.Histograms))
 	})
@@ -615,8 +681,61 @@ func funcSumOverTime(vals []parser.Value, args parser.Expressions, enh *EvalNode
 	})
 }
 
+// === sum_over_time(Matrix parser.ValueTypeMatrix) Vector ===
+func funcSumOverTimeSketch(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
+	if len(vals[0].(Matrix)[0].Floats) > 0 && len(vals[0].(Matrix)[0].Histograms) > 0 {
+		// TODO(zenador): Add warning for mixed floats and histograms.
+		return enh.Out
+	}
+	if len(vals[0].(Matrix)[0].Floats) == 0 {
+		// The passed values only contain histograms.
+		return aggrHistOverTime(vals, enh, func(s Series) *histogram.FloatHistogram {
+			sum := s.Histograms[0].H.Copy()
+			for _, h := range s.Histograms[1:] {
+				// The histogram being added must have
+				// an equal or larger schema.
+				if h.H.Schema >= sum.Schema {
+					sum.Add(h.H)
+				} else {
+					sum = h.H.Copy().Add(sum)
+				}
+			}
+			return sum
+		})
+	}
+	return aggrOverTime(vals, enh, func(s Series) float64 {
+		var sum, c float64
+		for _, f := range s.Floats {
+			sum, c = kahanSumInc(f.F, sum, c)
+		}
+		if math.IsInf(sum, 0) {
+			return sum
+		}
+		return sum + c
+	})
+}
+
 // === quantile_over_time(Matrix parser.ValueTypeMatrix) Vector ===
 func funcQuantileOverTime(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
+	q := vals[0].(Vector)[0].F
+	el := vals[1].(Matrix)[0]
+	if len(el.Floats) == 0 {
+		// TODO(beorn7): The passed values only contain
+		// histograms. quantile_over_time ignores histograms for now. If
+		// there are only histograms, we have to return without adding
+		// anything to enh.Out.
+		return enh.Out
+	}
+
+	values := make(vectorByValueHeap, 0, len(el.Floats))
+	for _, f := range el.Floats {
+		values = append(values, Sample{F: f.F})
+	}
+	return append(enh.Out, Sample{F: quantile(q, values)})
+}
+
+// === quantile_over_time(Matrix parser.ValueTypeMatrix) Vector ===
+func funcQuantileOverTimeSketch(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
 	q := vals[0].(Vector)[0].F
 	el := vals[1].(Matrix)[0]
 	if len(el.Floats) == 0 {
@@ -1346,76 +1465,80 @@ func funcYear(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper)
 
 // FunctionCalls is a list of all functions supported by PromQL, including their types.
 var FunctionCalls = map[string]FunctionCall{
-	"abs":                funcAbs,
-	"absent":             funcAbsent,
-	"absent_over_time":   funcAbsentOverTime,
-	"acos":               funcAcos,
-	"acosh":              funcAcosh,
-	"asin":               funcAsin,
-	"asinh":              funcAsinh,
-	"atan":               funcAtan,
-	"atanh":              funcAtanh,
-	"avg_over_time":      funcAvgOverTime,
-	"ceil":               funcCeil,
-	"changes":            funcChanges,
-	"clamp":              funcClamp,
-	"clamp_max":          funcClampMax,
-	"clamp_min":          funcClampMin,
-	"cos":                funcCos,
-	"cosh":               funcCosh,
-	"count_over_time":    funcCountOverTime,
-	"days_in_month":      funcDaysInMonth,
-	"day_of_month":       funcDayOfMonth,
-	"day_of_week":        funcDayOfWeek,
-	"day_of_year":        funcDayOfYear,
-	"deg":                funcDeg,
-	"delta":              funcDelta,
-	"deriv":              funcDeriv,
-	"exp":                funcExp,
-	"floor":              funcFloor,
-	"histogram_count":    funcHistogramCount,
-	"histogram_fraction": funcHistogramFraction,
-	"histogram_quantile": funcHistogramQuantile,
-	"histogram_sum":      funcHistogramSum,
-	"holt_winters":       funcHoltWinters,
-	"hour":               funcHour,
-	"idelta":             funcIdelta,
-	"increase":           funcIncrease,
-	"irate":              funcIrate,
-	"label_replace":      funcLabelReplace,
-	"label_join":         funcLabelJoin,
-	"ln":                 funcLn,
-	"log10":              funcLog10,
-	"log2":               funcLog2,
-	"last_over_time":     funcLastOverTime,
-	"max_over_time":      funcMaxOverTime,
-	"min_over_time":      funcMinOverTime,
-	"minute":             funcMinute,
-	"month":              funcMonth,
-	"pi":                 funcPi,
-	"predict_linear":     funcPredictLinear,
-	"present_over_time":  funcPresentOverTime,
-	"quantile_over_time": funcQuantileOverTime,
-	"rad":                funcRad,
-	"rate":               funcRate,
-	"resets":             funcResets,
-	"round":              funcRound,
-	"scalar":             funcScalar,
-	"sgn":                funcSgn,
-	"sin":                funcSin,
-	"sinh":               funcSinh,
-	"sort":               funcSort,
-	"sort_desc":          funcSortDesc,
-	"sqrt":               funcSqrt,
-	"stddev_over_time":   funcStddevOverTime,
-	"stdvar_over_time":   funcStdvarOverTime,
-	"sum_over_time":      funcSumOverTime,
-	"tan":                funcTan,
-	"tanh":               funcTanh,
-	"time":               funcTime,
-	"timestamp":          funcTimestamp,
-	"vector":             funcVector,
-	"year":               funcYear,
+	"abs":                       funcAbs,
+	"absent":                    funcAbsent,
+	"absent_over_time":          funcAbsentOverTime,
+	"acos":                      funcAcos,
+	"acosh":                     funcAcosh,
+	"asin":                      funcAsin,
+	"asinh":                     funcAsinh,
+	"atan":                      funcAtan,
+	"atanh":                     funcAtanh,
+	"avg_over_time":             funcAvgOverTime,
+	"avg_over_time_sketch":      funcAvgOverTimeSketch,
+	"ceil":                      funcCeil,
+	"changes":                   funcChanges,
+	"clamp":                     funcClamp,
+	"clamp_max":                 funcClampMax,
+	"clamp_min":                 funcClampMin,
+	"cos":                       funcCos,
+	"cosh":                      funcCosh,
+	"count_over_time":           funcCountOverTime,
+	"count_over_time_sketch":    funcCountOverTimeSketch,
+	"days_in_month":             funcDaysInMonth,
+	"day_of_month":              funcDayOfMonth,
+	"day_of_week":               funcDayOfWeek,
+	"day_of_year":               funcDayOfYear,
+	"deg":                       funcDeg,
+	"delta":                     funcDelta,
+	"deriv":                     funcDeriv,
+	"exp":                       funcExp,
+	"floor":                     funcFloor,
+	"histogram_count":           funcHistogramCount,
+	"histogram_fraction":        funcHistogramFraction,
+	"histogram_quantile":        funcHistogramQuantile,
+	"histogram_sum":             funcHistogramSum,
+	"holt_winters":              funcHoltWinters,
+	"hour":                      funcHour,
+	"idelta":                    funcIdelta,
+	"increase":                  funcIncrease,
+	"irate":                     funcIrate,
+	"label_replace":             funcLabelReplace,
+	"label_join":                funcLabelJoin,
+	"ln":                        funcLn,
+	"log10":                     funcLog10,
+	"log2":                      funcLog2,
+	"last_over_time":            funcLastOverTime,
+	"max_over_time":             funcMaxOverTime,
+	"min_over_time":             funcMinOverTime,
+	"minute":                    funcMinute,
+	"month":                     funcMonth,
+	"pi":                        funcPi,
+	"predict_linear":            funcPredictLinear,
+	"present_over_time":         funcPresentOverTime,
+	"quantile_over_time":        funcQuantileOverTime,
+	"quantile_over_time_sketch": funcQuantileOverTimeSketch,
+	"rad":                       funcRad,
+	"rate":                      funcRate,
+	"resets":                    funcResets,
+	"round":                     funcRound,
+	"scalar":                    funcScalar,
+	"sgn":                       funcSgn,
+	"sin":                       funcSin,
+	"sinh":                      funcSinh,
+	"sort":                      funcSort,
+	"sort_desc":                 funcSortDesc,
+	"sqrt":                      funcSqrt,
+	"stddev_over_time":          funcStddevOverTime,
+	"stdvar_over_time":          funcStdvarOverTime,
+	"sum_over_time":             funcSumOverTime,
+	"sum_over_time_sketch":      funcSumOverTimeSketch,
+	"tan":                       funcTan,
+	"tanh":                      funcTanh,
+	"time":                      funcTime,
+	"timestamp":                 funcTimestamp,
+	"vector":                    funcVector,
+	"year":                      funcYear,
 }
 
 // AtModifierUnsafeFunctions are the functions whose result

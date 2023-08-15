@@ -2073,6 +2073,7 @@ func (ev *evaluator) evalSketch(expr parser.Expr) (parser.Value, storage.Warning
 		ev.error(err)
 	}
 	numSteps := int((ev.endTimestamp-ev.startTimestamp)/ev.interval) + 1
+	fmt.Println(ev.startTimestamp, ev.endTimestamp)
 
 	// Create a new span to help investigate inner evaluation performances.
 	ctxWithSpan, span := otel.Tracer("").Start(ev.ctx, stats.InnerEvalTime.SpanOperation()+" eval "+reflect.TypeOf(expr).String())
@@ -2083,7 +2084,9 @@ func (ev *evaluator) evalSketch(expr parser.Expr) (parser.Value, storage.Warning
 	case *parser.AggregateExpr:
 		// Grouping labels must be sorted (expected both by generateGroupingKey() and aggregation()).
 		sortedGrouping := e.Grouping
+		fmt.Println("sorted Grouping:", sortedGrouping)
 		slices.Sort(sortedGrouping)
+		fmt.Println("sorted Grouping:", sortedGrouping)
 
 		// Prepare a function to initialise series helpers with the grouping key.
 		buf := make([]byte, 0, 1024)
