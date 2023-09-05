@@ -2073,7 +2073,7 @@ func (ev *evaluator) evalSketch(expr parser.Expr) (parser.Value, storage.Warning
 		ev.error(err)
 	}
 	numSteps := int((ev.endTimestamp-ev.startTimestamp)/ev.interval) + 1
-	fmt.Println(ev.startTimestamp, ev.endTimestamp)
+	// fmt.Println(ev.startTimestamp, ev.endTimestamp)
 
 	// Create a new span to help investigate inner evaluation performances.
 	ctxWithSpan, span := otel.Tracer("").Start(ev.ctx, stats.InnerEvalTime.SpanOperation()+" eval "+reflect.TypeOf(expr).String())
@@ -2084,9 +2084,8 @@ func (ev *evaluator) evalSketch(expr parser.Expr) (parser.Value, storage.Warning
 	case *parser.AggregateExpr:
 		// Grouping labels must be sorted (expected both by generateGroupingKey() and aggregation()).
 		sortedGrouping := e.Grouping
-		fmt.Println("sorted Grouping:", sortedGrouping)
 		slices.Sort(sortedGrouping)
-		fmt.Println("sorted Grouping:", sortedGrouping)
+		// fmt.Println("sorted Grouping:", sortedGrouping)
 
 		// Prepare a function to initialise series helpers with the grouping key.
 		buf := make([]byte, 0, 1024)
@@ -2099,6 +2098,7 @@ func (ev *evaluator) evalSketch(expr parser.Expr) (parser.Value, storage.Warning
 		unwrapParenExpr(&param)
 		if s, ok := param.(*parser.StringLiteral); ok {
 			return ev.rangeEval(initSeries, func(v []parser.Value, sh [][]EvalSeriesHelper, enh *EvalNodeHelper) (Vector, storage.Warnings) {
+				// fmt.Println("v[0].(Vector) =", v[0].(Vector))
 				return ev.aggregation(e.Op, sortedGrouping, e.Without, s.Val, v[0].(Vector), sh[0], enh), nil
 			}, e.Expr)
 		}
@@ -2112,27 +2112,8 @@ func (ev *evaluator) evalSketch(expr parser.Expr) (parser.Value, storage.Warning
 		}, e.Param, e.Expr)
 
 	case *parser.Call:
-		call := FunctionCalls[e.Func.Name]
-		if e.Func.Name == "timestamp" {
-			// Matrix evaluation always returns the evaluation time,
-			// so this function needs special handling when given
-			// a vector selector.
-			unwrapParenExpr(&e.Args[0])
-			arg := unwrapStepInvariantExpr(e.Args[0])
-			unwrapParenExpr(&arg)
-			vs, ok := arg.(*parser.VectorSelector)
-			if ok {
-				return ev.rangeEval(nil, func(v []parser.Value, _ [][]EvalSeriesHelper, enh *EvalNodeHelper) (Vector, storage.Warnings) {
-					if vs.Timestamp != nil {
-						// This is a special case only for "timestamp" since the offset
-						// needs to be adjusted for every point.
-						vs.Offset = time.Duration(enh.Ts-*vs.Timestamp) * time.Millisecond
-					}
-					val, ws := ev.vectorSelector(vs, enh.Ts)
-					return call([]parser.Value{val}, e.Args, enh), ws
-				})
-			}
-		}
+		fmt.Println("expr_init=", expr)
+		sketchCall := FunctionCalls[e.Func.Name] // e.g., avg_over_time_sketch
 
 		// Check if the function has a matrix argument.
 		var (
@@ -2168,7 +2149,7 @@ func (ev *evaluator) evalSketch(expr parser.Expr) (parser.Value, storage.Warning
 		if !matrixArg {
 			// Does not have a matrix argument.
 			return ev.rangeEval(nil, func(v []parser.Value, _ [][]EvalSeriesHelper, enh *EvalNodeHelper) (Vector, storage.Warnings) {
-				return call(v, e.Args, enh), warnings
+				return sketchCall(v, e.Args, enh), warnings
 			}, e.Args...)
 		}
 
@@ -2235,6 +2216,12 @@ func (ev *evaluator) evalSketch(expr parser.Expr) (parser.Value, storage.Warning
 				Metric: metric,
 			}
 			inMatrix[0].Metric = selVS.Series[i].Labels()
+
+			fmt.Println("expr=", expr)
+			fmt.Println("inMatrix[0].Metric=", inMatrix[0].Metric)
+			fmt.Println("start timestamp =", ev.startTimestamp, "end timestamp =", ev.endTimestamp, "interval =", ev.interval)
+			// TODO: rewrite this part to sliding window + sketch; rewrite this AST for rule
+			// This query only executes once, not belongs to a rule, then we query intervals
 			for ts, step := ev.startTimestamp, -1; ts <= ev.endTimestamp; ts += ev.interval {
 				step++
 				// Set the non-matrix arguments.
@@ -2247,6 +2234,7 @@ func (ev *evaluator) evalSketch(expr parser.Expr) (parser.Value, storage.Warning
 				}
 				maxt := ts - offset
 				mint := maxt - selRange
+
 				// Evaluate the matrix selector for this series for this step.
 				floats, histograms = ev.matrixIterSlice(it, mint, maxt, floats, histograms)
 				if len(floats)+len(histograms) == 0 {
@@ -2255,8 +2243,9 @@ func (ev *evaluator) evalSketch(expr parser.Expr) (parser.Value, storage.Warning
 				inMatrix[0].Floats = floats
 				inMatrix[0].Histograms = histograms
 				enh.Ts = ts
-				// Make the function call.
-				outVec := call(inArgs, e.Args, enh)
+				// Make the function call to sketch query
+				outVec := sketchCall(inArgs, e.Args, enh)
+
 				ev.samplesStats.IncrementSamplesAtStep(step, int64(len(floats)+len(histograms)))
 				enh.Out = outVec[:0]
 				if len(outVec) > 0 {
