@@ -1,0 +1,34 @@
+inMatrix[0].Metric= {__name__="metricWith1SampleEvery10Seconds"}
+inMatrix[0].Metric= {__name__="metricWith1SampleEvery10Seconds"}
+inMatrix[0].Metric= {__name__="metricWith1SampleEvery10Seconds"}
+inMatrix[0].Metric= {__name__="metricWith1SampleEvery10Seconds"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="3", b="2"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="1", b="1"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="2", b="2"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="3", b="2"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="1", b="1"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="2", b="2"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="3", b="2"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="1", b="1"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="2", b="2"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="3", b="2"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="1", b="1"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="2", b="2"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="1", b="1"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="1", b="1"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="3", b="2"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="1", b="1"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="2", b="2"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="3", b="2"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="1", b="1"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="2", b="2"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="3", b="2"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="1", b="1"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="2", b="2"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="3", b="2"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="1", b="1"}
+inMatrix[0].Metric= {__name__="metricWith3SampleEvery10Seconds", a="2", b="2"}
+inMatrix[0].Metric= {__name__="metricWith1SampleEvery10Seconds"}
+inMatrix[0].Metric= {__name__="metricWith1SampleEvery10Seconds"}
+PASS
+ok  	github.com/prometheus/prometheus/promql	7.528s

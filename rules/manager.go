@@ -334,6 +334,7 @@ type GroupOptions struct {
 	done                    chan struct{}
 	EvalIterationFunc       GroupEvalIterationFunc
 	EvalIterationFuncSketch GroupEvalIterationFuncSketch
+	evalSlidingWindowFunc 	GroupSlidingWindowFuncSketch
 }
 
 // NewGroup makes a new Group with the given name, options, and rules.
@@ -447,6 +448,8 @@ func (g *Group) run(ctx context.Context) {
 		}(time.Now())
 	}()
 
+	g.evalSlidingWindowFunc(ctx, g, evalTimestamp) // replace the below iteration functions
+	
 	g.evalIterationFunc(ctx, g, evalTimestamp)
 	if g.shouldRestore {
 		// If we have to restore, we wait for another Eval to finish.

@@ -26,6 +26,7 @@ import (
 	"github.com/prometheus/prometheus/model/rulefmt"
 	"github.com/prometheus/prometheus/promql"
 	"github.com/prometheus/prometheus/promql/parser"
+	// "github.com/Prometheus-sketch/promsketch"
 )
 
 // A RecordingRule records its vector expression into new timeseries.
@@ -117,7 +118,17 @@ func (rule *RecordingRule) EvalSketch(ctx context.Context, ts time.Time, query Q
 	ctx = NewOriginContext(ctx, NewRuleDetail(rule))
 
 	vector, err := query(ctx, rule.vector.String(), ts)
+	// TODO: rewrite this query to call interval query; Add time window size to input
+	// TODO: change rule parser template
+
 	fmt.Println("EvalSketch:", vector)
+	fmt.Println("rule.vector.String():", rule.vector.String())
+	fmt.Println("ctx:", ctx)
+	fmt.Println(ts)
+
+	// query_univmon_distinct(query_interval_merge(t1, t2, windwo_size))
+
+	
 	if err != nil {
 		return nil, err
 	}
