@@ -27,6 +27,7 @@ import (
 	// "github.com/prometheus/prometheus/model/timestamp"
 	"github.com/prometheus/prometheus/promql"
 	"github.com/prometheus/prometheus/promql/parser"
+
 	// "github.com/prometheus/prometheus/util/teststorage"
 	"github.com/prometheus/prometheus/util/testutil"
 )
@@ -115,7 +116,7 @@ func TestRuleEvalPressure(t *testing.T) {
 	require.NoError(t, err)
 
 	// quantile_over_time (range query)
-	expr, err := parser.ParseExpr(`sum by(instance) (quantile_over_time(0.99, http_requests[900s]))`)
+	expr, err := parser.ParseExpr(`(quantile_over_time(0.99, http_requests[100000s]))`)
 	// avg_over_time (range query)
 	// expr, err := parser.ParseExpr(`sum by(instance) (avg_over_time(http_requests[900s]))`)
 	// Entropy (instant query)
@@ -137,7 +138,7 @@ func TestRuleEvalPressure(t *testing.T) {
 	for _, test := range tests {
 		test.expr = expr
 		rule := NewRecordingRule(test.name, test.expr, test.labels)
-		for i := 1; i < 10001; i++ { // recording rule evaluated per second
+		for i := 1; i < 1000001; i++ { // recording rule evaluated per second
 			evalTime := time.Unix((int64)(i), 0)
 			_, _ = rule.Eval(suite.Context(), evalTime, EngineQueryFunc(suite.QueryEngine(), suite.Storage()), nil, 0) // no limit here
 
