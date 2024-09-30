@@ -22,15 +22,15 @@ import (
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 
-	"github.com/prometheus/prometheus/model/exemplar"
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/metadata"
-	"github.com/prometheus/prometheus/model/value"
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/tsdb/chunkenc"
-	"github.com/prometheus/prometheus/tsdb/chunks"
-	"github.com/prometheus/prometheus/tsdb/record"
+	"github.com/zzylol/prometheus/model/exemplar"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/metadata"
+	"github.com/zzylol/prometheus/model/value"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/tsdb/chunkenc"
+	"github.com/zzylol/prometheus/tsdb/chunks"
+	"github.com/zzylol/prometheus/tsdb/record"
 )
 
 // initAppender is a helper to initialize the time bounds of the head
@@ -1176,7 +1176,7 @@ func (a *headAppender) Commit() (err error) {
 				// Sample is an exact duplicate of the last sample.
 				// NOTE: We can only detect updates if they clash with a sample in the OOOHeadChunk,
 				// not with samples in already flushed OOO chunks.
-				// TODO(codesome): Add error reporting? It depends on addressing https://github.com/prometheus/prometheus/discussions/10305.
+				// TODO(codesome): Add error reporting? It depends on addressing https://github.com/zzylol/prometheus/discussions/10305.
 				floatsAppended--
 			}
 		default:
@@ -1272,7 +1272,7 @@ func (a *headAppender) Commit() (err error) {
 				// Sample is an exact duplicate of the last sample.
 				// NOTE: We can only detect updates if they clash with a sample in the OOOHeadChunk,
 				// not with samples in already flushed OOO chunks.
-				// TODO(codesome): Add error reporting? It depends on addressing https://github.com/prometheus/prometheus/discussions/10305.
+				// TODO(codesome): Add error reporting? It depends on addressing https://github.com/zzylol/prometheus/discussions/10305.
 				histogramsAppended--
 			}
 		default:
@@ -1368,7 +1368,7 @@ func (a *headAppender) Commit() (err error) {
 				// Sample is an exact duplicate of the last sample.
 				// NOTE: We can only detect updates if they clash with a sample in the OOOHeadChunk,
 				// not with samples in already flushed OOO chunks.
-				// TODO(codesome): Add error reporting? It depends on addressing https://github.com/prometheus/prometheus/discussions/10305.
+				// TODO(codesome): Add error reporting? It depends on addressing https://github.com/zzylol/prometheus/discussions/10305.
 				histogramsAppended--
 			}
 		default:

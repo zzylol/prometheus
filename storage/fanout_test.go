@@ -21,11 +21,11 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/tsdb/chunkenc"
-	"github.com/prometheus/prometheus/util/annotations"
-	"github.com/prometheus/prometheus/util/teststorage"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/tsdb/chunkenc"
+	"github.com/zzylol/prometheus/util/annotations"
+	"github.com/zzylol/prometheus/util/teststorage"
 )
 
 func TestFanout_SelectSorted(t *testing.T) {

@@ -55,30 +55,30 @@ import (
 	"k8s.io/klog"
 	klogv2 "k8s.io/klog/v2"
 
-	"github.com/prometheus/prometheus/config"
-	"github.com/prometheus/prometheus/discovery"
-	"github.com/prometheus/prometheus/model/exemplar"
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/metadata"
-	"github.com/prometheus/prometheus/model/relabel"
-	"github.com/prometheus/prometheus/notifier"
-	_ "github.com/prometheus/prometheus/plugins" // Register plugins.
-	"github.com/prometheus/prometheus/promql"
-	"github.com/prometheus/prometheus/promql/parser"
-	"github.com/prometheus/prometheus/rules"
-	"github.com/prometheus/prometheus/scrape"
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/storage/remote"
-	"github.com/prometheus/prometheus/tracing"
-	"github.com/prometheus/prometheus/tsdb"
-	"github.com/prometheus/prometheus/tsdb/agent"
-	"github.com/prometheus/prometheus/tsdb/wlog"
-	"github.com/prometheus/prometheus/util/documentcli"
-	"github.com/prometheus/prometheus/util/logging"
-	prom_runtime "github.com/prometheus/prometheus/util/runtime"
-	"github.com/prometheus/prometheus/web"
-	"github.com/prometheus/prometheus/web/api"
+	"github.com/zzylol/prometheus/config"
+	"github.com/zzylol/prometheus/discovery"
+	"github.com/zzylol/prometheus/model/exemplar"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/metadata"
+	"github.com/zzylol/prometheus/model/relabel"
+	"github.com/zzylol/prometheus/notifier"
+	_ "github.com/zzylol/prometheus/plugins" // Register plugins.
+	"github.com/zzylol/prometheus/promql"
+	"github.com/zzylol/prometheus/promql/parser"
+	"github.com/zzylol/prometheus/rules"
+	"github.com/zzylol/prometheus/scrape"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/storage/remote"
+	"github.com/zzylol/prometheus/tracing"
+	"github.com/zzylol/prometheus/tsdb"
+	"github.com/zzylol/prometheus/tsdb/agent"
+	"github.com/zzylol/prometheus/tsdb/wlog"
+	"github.com/zzylol/prometheus/util/documentcli"
+	"github.com/zzylol/prometheus/util/logging"
+	prom_runtime "github.com/zzylol/prometheus/util/runtime"
+	"github.com/zzylol/prometheus/web"
+	"github.com/zzylol/prometheus/web/api"
 )
 
 var (
@@ -337,7 +337,7 @@ func main() {
 		Default("false").BoolVar(&cfg.web.EnableAdminAPI)
 
 	// TODO(bwplotka): Consider allowing those remote receive flags to be changed in config.
-	// See https://github.com/prometheus/prometheus/issues/14410
+	// See https://github.com/zzylol/prometheus/issues/14410
 	a.Flag("web.enable-remote-write-receiver", "Enable API endpoint accepting remote write requests.").
 		Default("false").BoolVar(&cfg.web.EnableRemoteWriteReceiver)
 
@@ -448,10 +448,10 @@ func main() {
 	serverOnlyFlag(a, "rules.max-concurrent-evals", "Global concurrency limit for independent rules that can run concurrently. When set, \"query.max-concurrency\" may need to be adjusted accordingly.").
 		Default("4").Int64Var(&cfg.maxConcurrentEvals)
 
-	a.Flag("scrape.adjust-timestamps", "Adjust scrape timestamps by up to `scrape.timestamp-tolerance` to align them to the intended schedule. See https://github.com/prometheus/prometheus/issues/7846 for more context. Experimental. This flag will be removed in a future release.").
+	a.Flag("scrape.adjust-timestamps", "Adjust scrape timestamps by up to `scrape.timestamp-tolerance` to align them to the intended schedule. See https://github.com/zzylol/prometheus/issues/7846 for more context. Experimental. This flag will be removed in a future release.").
 		Hidden().Default("true").BoolVar(&scrape.AlignScrapeTimestamps)
 
-	a.Flag("scrape.timestamp-tolerance", "Timestamp tolerance. See https://github.com/prometheus/prometheus/issues/7846 for more context. Experimental. This flag will be removed in a future release.").
+	a.Flag("scrape.timestamp-tolerance", "Timestamp tolerance. See https://github.com/zzylol/prometheus/issues/7846 for more context. Experimental. This flag will be removed in a future release.").
 		Hidden().Default("2ms").DurationVar(&scrape.ScrapeTimestampTolerance)
 
 	serverOnlyFlag(a, "alertmanager.notification-queue-capacity", "The capacity of the queue for pending Alertmanager notifications.").

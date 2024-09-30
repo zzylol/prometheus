@@ -36,10 +36,10 @@ import (
 	"github.com/prometheus/common/version"
 	"go.uber.org/atomic"
 
-	"github.com/prometheus/prometheus/config"
-	"github.com/prometheus/prometheus/discovery/targetgroup"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/relabel"
+	"github.com/zzylol/prometheus/config"
+	"github.com/zzylol/prometheus/discovery/targetgroup"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/relabel"
 )
 
 const (
@@ -302,7 +302,7 @@ func (n *Manager) nextBatch() []*Alert {
 // pending notifications have been drained from the queue (if draining is enabled).
 //
 // Dispatching of notifications occurs in parallel to processing target updates to avoid one starving the other.
-// Refer to https://github.com/prometheus/prometheus/issues/13676 for more details.
+// Refer to https://github.com/zzylol/prometheus/issues/13676 for more details.
 func (n *Manager) Run(tsets <-chan map[string][]*targetgroup.Group) {
 	wg := sync.WaitGroup{}
 	wg.Add(2)

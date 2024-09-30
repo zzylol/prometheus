@@ -25,9 +25,9 @@ import (
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 
-	"github.com/prometheus/prometheus/model/value"
-	"github.com/prometheus/prometheus/prompb"
-	"github.com/prometheus/prometheus/util/annotations"
+	"github.com/zzylol/prometheus/model/value"
+	"github.com/zzylol/prometheus/prompb"
+	"github.com/zzylol/prometheus/util/annotations"
 )
 
 const defaultZeroThreshold = 1e-128
@@ -101,7 +101,7 @@ func exponentialToNativeHistogram(p pmetric.ExponentialHistogramDataPoint) (prom
 		// TODO: using created time stamp should be accurate, but we
 		// need to know here if it was used for the detection.
 		// Ref: https://github.com/open-telemetry/opentelemetry-collector-contrib/pull/28663#issuecomment-1810577303
-		// Counter reset detection in Prometheus: https://github.com/prometheus/prometheus/blob/f997c72f294c0f18ca13fa06d51889af04135195/tsdb/chunkenc/histogram.go#L232
+		// Counter reset detection in Prometheus: https://github.com/zzylol/prometheus/blob/f997c72f294c0f18ca13fa06d51889af04135195/tsdb/chunkenc/histogram.go#L232
 		ResetHint: prompb.Histogram_UNKNOWN,
 		Schema:    scale,
 

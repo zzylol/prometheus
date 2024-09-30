@@ -26,9 +26,9 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/tsdb"
-	"github.com/prometheus/prometheus/tsdb/chunkenc"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/tsdb"
+	"github.com/zzylol/prometheus/tsdb/chunkenc"
 )
 
 type mockQueryRangeAPI struct {

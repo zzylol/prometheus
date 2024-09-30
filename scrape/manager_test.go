@@ -35,16 +35,16 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gopkg.in/yaml.v2"
 
-	"github.com/prometheus/prometheus/config"
-	"github.com/prometheus/prometheus/discovery"
-	_ "github.com/prometheus/prometheus/discovery/file"
-	"github.com/prometheus/prometheus/discovery/targetgroup"
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/relabel"
-	"github.com/prometheus/prometheus/tsdb/tsdbutil"
-	"github.com/prometheus/prometheus/util/runutil"
-	"github.com/prometheus/prometheus/util/testutil"
+	"github.com/zzylol/prometheus/config"
+	"github.com/zzylol/prometheus/discovery"
+	_ "github.com/zzylol/prometheus/discovery/file"
+	"github.com/zzylol/prometheus/discovery/targetgroup"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/relabel"
+	"github.com/zzylol/prometheus/tsdb/tsdbutil"
+	"github.com/zzylol/prometheus/util/runutil"
+	"github.com/zzylol/prometheus/util/testutil"
 )
 
 func init() {
@@ -1298,7 +1298,7 @@ scrape_configs:
 
 // TestProviderStaleTargetsAreDropped makes sure that when a job has only one provider and when that provider
 // should no longer discover targets, the targets of that provider are dropped.
-// See: https://github.com/prometheus/prometheus/issues/12858
+// See: https://github.com/zzylol/prometheus/issues/12858
 func TestProviderStaleTargetsAreDropped(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

@@ -33,11 +33,11 @@ import (
 	"github.com/prometheus/common/sigv4"
 	"gopkg.in/yaml.v2"
 
-	"github.com/prometheus/prometheus/discovery"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/relabel"
-	"github.com/prometheus/prometheus/storage/remote/azuread"
-	"github.com/prometheus/prometheus/storage/remote/googleiam"
+	"github.com/zzylol/prometheus/discovery"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/relabel"
+	"github.com/zzylol/prometheus/storage/remote/azuread"
+	"github.com/zzylol/prometheus/storage/remote/googleiam"
 )
 
 var (
@@ -104,7 +104,7 @@ func Load(s string, expandExternalLabels bool, logger log.Logger) (*Config, erro
 		if newV != v.Value {
 			level.Debug(logger).Log("msg", "External label replaced", "label", v.Name, "input", v.Value, "output", newV)
 		}
-		// Note newV can be blank. https://github.com/prometheus/prometheus/issues/11024
+		// Note newV can be blank. https://github.com/zzylol/prometheus/issues/11024
 		b.Add(v.Name, newV)
 	})
 	cfg.GlobalConfig.ExternalLabels = b.Labels()

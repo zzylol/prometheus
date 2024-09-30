@@ -33,18 +33,18 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
 	"go.uber.org/atomic"
 
-	"github.com/prometheus/prometheus/config"
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/metadata"
-	"github.com/prometheus/prometheus/model/relabel"
-	"github.com/prometheus/prometheus/model/timestamp"
-	"github.com/prometheus/prometheus/prompb"
-	writev2 "github.com/prometheus/prometheus/prompb/io/prometheus/write/v2"
-	"github.com/prometheus/prometheus/scrape"
-	"github.com/prometheus/prometheus/tsdb/chunks"
-	"github.com/prometheus/prometheus/tsdb/record"
-	"github.com/prometheus/prometheus/tsdb/wlog"
+	"github.com/zzylol/prometheus/config"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/metadata"
+	"github.com/zzylol/prometheus/model/relabel"
+	"github.com/zzylol/prometheus/model/timestamp"
+	"github.com/zzylol/prometheus/prompb"
+	writev2 "github.com/zzylol/prometheus/prompb/io/prometheus/write/v2"
+	"github.com/zzylol/prometheus/scrape"
+	"github.com/zzylol/prometheus/tsdb/chunks"
+	"github.com/zzylol/prometheus/tsdb/record"
+	"github.com/zzylol/prometheus/tsdb/wlog"
 )
 
 const (
@@ -715,7 +715,7 @@ outer:
 			continue
 		}
 		// TODO(cstyan): Handle or at least log an error if no metadata is found.
-		// See https://github.com/prometheus/prometheus/issues/14405
+		// See https://github.com/zzylol/prometheus/issues/14405
 		meta := t.seriesMetadata[s.Ref]
 		t.seriesMtx.Unlock()
 		// Start with a very small backoff. This should not be t.cfg.MinBackoff
@@ -1420,7 +1420,7 @@ func (q *queue) Append(datum timeSeries) bool {
 	// TODO(cstyan): Check if metadata now means we've reduced the total # of samples
 	// we can batch together here, and if so find a way to not include metadata
 	// in the batch size calculation.
-	// See https://github.com/prometheus/prometheus/issues/14405
+	// See https://github.com/zzylol/prometheus/issues/14405
 	q.batch = append(q.batch, datum)
 	if len(q.batch) == cap(q.batch) {
 		select {
@@ -1602,7 +1602,7 @@ func (s *shards) runShard(ctx context.Context, shardID int, queue *queue) {
 
 			sendBatch(batch, s.qm.protoMsg, s.qm.enc, false)
 			// TODO(bwplotka): Previously the return was between popular and send.
-			// Consider this when DRY-ing https://github.com/prometheus/prometheus/issues/14409
+			// Consider this when DRY-ing https://github.com/zzylol/prometheus/issues/14409
 			queue.ReturnForReuse(batch)
 
 			stop()
@@ -1668,7 +1668,7 @@ func (s *shards) sendSamples(ctx context.Context, samples []prompb.TimeSeries, s
 }
 
 // TODO(bwplotka): DRY this (have one logic for both v1 and v2).
-// See https://github.com/prometheus/prometheus/issues/14409
+// See https://github.com/zzylol/prometheus/issues/14409
 func (s *shards) sendV2Samples(ctx context.Context, samples []writev2.TimeSeries, labels []string, sampleCount, exemplarCount, histogramCount, metadataCount int, pBuf, buf *[]byte, enc Compression) error {
 	begin := time.Now()
 	rs, err := s.sendV2SamplesWithBackoff(ctx, samples, labels, sampleCount, exemplarCount, histogramCount, metadataCount, pBuf, buf, enc)

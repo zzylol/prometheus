@@ -29,7 +29,7 @@ import "gogoproto/gogo.proto";
 //
 // NOTE: gogoproto options might change in future for this file, they
 // are not part of the spec proto (they only modify the generated Go code, not
-// the serialized message). See: https://github.com/prometheus/prometheus/issues/11908
+// the serialized message). See: https://github.com/zzylol/prometheus/issues/11908
 message Request {
   // Since Request supersedes 1.0 spec's prometheus.WriteRequest, we reserve the top-down message
   // for the deterministic interop between those two, see types_test.go for details.
@@ -85,7 +85,7 @@ message TimeSeries {
   // Note that some receivers might require this and in return fail to
   // ingest such samples within the Request.
   //
-  // For Go, see github.com/prometheus/prometheus/model/timestamp/timestamp.go
+  // For Go, see github.com/zzylol/prometheus/model/timestamp/timestamp.go
   // for conversion from/to time.Time to Prometheus timestamp.
   //
   // Note that the "optional" keyword is omitted due to
@@ -109,7 +109,7 @@ message Exemplar {
   double value = 2;
   // timestamp represents the timestamp of the exemplar in ms.
   //
-  // For Go, see github.com/prometheus/prometheus/model/timestamp/timestamp.go
+  // For Go, see github.com/zzylol/prometheus/model/timestamp/timestamp.go
   // for conversion from/to time.Time to Prometheus timestamp.
   int64 timestamp = 3;
 }
@@ -120,7 +120,7 @@ message Sample {
   double value = 1;
   // timestamp represents timestamp of the sample in ms.
   //
-  // For Go, see github.com/prometheus/prometheus/model/timestamp/timestamp.go
+  // For Go, see github.com/zzylol/prometheus/model/timestamp/timestamp.go
   // for conversion from/to time.Time to Prometheus timestamp.
   int64 timestamp = 2;
 }
@@ -210,7 +210,7 @@ message Histogram {
   ResetHint reset_hint               = 14;
   // timestamp represents timestamp of the sample in ms.
   //
-  // For Go, see github.com/prometheus/prometheus/model/timestamp/timestamp.go
+  // For Go, see github.com/zzylol/prometheus/model/timestamp/timestamp.go
   // for conversion from/to time.Time to Prometheus timestamp.
   int64 timestamp = 15;
 

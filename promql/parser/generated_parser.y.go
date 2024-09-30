@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/value"
-	"github.com/prometheus/prometheus/promql/parser/posrange"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/value"
+	"github.com/zzylol/prometheus/promql/parser/posrange"
 
 	"github.com/prometheus/common/model"
 )

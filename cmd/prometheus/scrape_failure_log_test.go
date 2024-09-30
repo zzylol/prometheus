@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/atomic"
 
-	"github.com/prometheus/prometheus/util/testutil"
+	"github.com/zzylol/prometheus/util/testutil"
 )
 
 func TestScrapeFailureLogFile(t *testing.T) {

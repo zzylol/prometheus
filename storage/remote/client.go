@@ -35,11 +35,11 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/prometheus/prometheus/config"
-	"github.com/prometheus/prometheus/prompb"
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/storage/remote/azuread"
-	"github.com/prometheus/prometheus/storage/remote/googleiam"
+	"github.com/zzylol/prometheus/config"
+	"github.com/zzylol/prometheus/prompb"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/storage/remote/azuread"
+	"github.com/zzylol/prometheus/storage/remote/googleiam"
 )
 
 const (

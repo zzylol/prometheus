@@ -18,8 +18,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/tsdb/chunkenc"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/tsdb/chunkenc"
 )
 
 func TestMockSeries(t *testing.T) {

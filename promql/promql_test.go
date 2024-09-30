@@ -22,10 +22,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/prometheus/prometheus/promql"
-	"github.com/prometheus/prometheus/promql/parser"
-	"github.com/prometheus/prometheus/promql/promqltest"
-	"github.com/prometheus/prometheus/util/teststorage"
+	"github.com/zzylol/prometheus/promql"
+	"github.com/zzylol/prometheus/promql/parser"
+	"github.com/zzylol/prometheus/promql/promqltest"
+	"github.com/zzylol/prometheus/util/teststorage"
 )
 
 func newTestEngine(t *testing.T) *promql.Engine {

@@ -33,11 +33,11 @@ import (
 	"go.opentelemetry.io/collector/pdata/pmetric"
 	conventions "go.opentelemetry.io/collector/semconv/v1.6.1"
 
-	"github.com/prometheus/prometheus/model/timestamp"
-	"github.com/prometheus/prometheus/model/value"
-	"github.com/prometheus/prometheus/prompb"
+	"github.com/zzylol/prometheus/model/timestamp"
+	"github.com/zzylol/prometheus/model/value"
+	"github.com/zzylol/prometheus/prompb"
 
-	prometheustranslator "github.com/prometheus/prometheus/storage/remote/otlptranslator/prometheus"
+	prometheustranslator "github.com/zzylol/prometheus/storage/remote/otlptranslator/prometheus"
 )
 
 const (
@@ -241,7 +241,7 @@ func isValidAggregationTemporality(metric pmetric.Metric) bool {
 // Note that we can't convert to native histograms, since these have exponential buckets and don't line up
 // with the user defined bucket boundaries of non-exponential OTel histograms.
 // However, work is under way to resolve this shortcoming through a feature called native histograms custom buckets:
-// https://github.com/prometheus/prometheus/issues/13485.
+// https://github.com/zzylol/prometheus/issues/13485.
 func (c *PrometheusConverter) addHistogramDataPoints(ctx context.Context, dataPoints pmetric.HistogramDataPointSlice,
 	resource pcommon.Resource, settings Settings, baseName string) error {
 	for x := 0; x < dataPoints.Len(); x++ {

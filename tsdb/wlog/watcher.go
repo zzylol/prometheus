@@ -28,9 +28,9 @@ import (
 	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/timestamp"
-	"github.com/prometheus/prometheus/tsdb/record"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/timestamp"
+	"github.com/zzylol/prometheus/tsdb/record"
 )
 
 const (

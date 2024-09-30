@@ -25,9 +25,9 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/require"
 
-	"github.com/prometheus/prometheus/model/exemplar"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/storage"
+	"github.com/zzylol/prometheus/model/exemplar"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/storage"
 )
 
 var eMetrics = NewExemplarMetrics(prometheus.DefaultRegisterer)

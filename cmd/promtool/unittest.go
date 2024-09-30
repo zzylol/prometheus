@@ -34,14 +34,14 @@ import (
 
 	"github.com/prometheus/common/model"
 
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/promql"
-	"github.com/prometheus/prometheus/promql/parser"
-	"github.com/prometheus/prometheus/promql/promqltest"
-	"github.com/prometheus/prometheus/rules"
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/util/junitxml"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/promql"
+	"github.com/zzylol/prometheus/promql/parser"
+	"github.com/zzylol/prometheus/promql/promqltest"
+	"github.com/zzylol/prometheus/rules"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/util/junitxml"
 )
 
 // RulesUnitTest does unit testing of rules based on the unit testing files provided.

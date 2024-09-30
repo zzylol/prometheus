@@ -3,26 +3,26 @@ header:
   expiration-date: '2025-07-30T01:00:00.000Z'
   last-updated: '2024-07-30'
   last-reviewed: '2024-07-30'
-  project-url: https://github.com/prometheus/prometheus
-  changelog: https://github.com/prometheus/prometheus/blob/main/CHANGELOG.md
-  license: https://github.com/prometheus/prometheus/blob/main/LICENSE
+  project-url: https://github.com/zzylol/prometheus
+  changelog: https://github.com/zzylol/prometheus/blob/main/CHANGELOG.md
+  license: https://github.com/zzylol/prometheus/blob/main/LICENSE
 project-lifecycle:
   status: active
   bug-fixes-only: false
   core-maintainers:
-    - https://github.com/prometheus/prometheus/blob/main/MAINTAINERS.md
+    - https://github.com/zzylol/prometheus/blob/main/MAINTAINERS.md
 contribution-policy:
   accepts-pull-requests: true
   accepts-automated-pull-requests: true
 dependencies:
   third-party-packages: true
   dependencies-lists:
-    - https://github.com/prometheus/prometheus/blob/main/go.mod
-    - https://github.com/prometheus/prometheus/blob/main/web/ui/package.json
+    - https://github.com/zzylol/prometheus/blob/main/go.mod
+    - https://github.com/zzylol/prometheus/blob/main/web/ui/package.json
   env-dependencies-policy:
-    policy-url: https://github.com/prometheus/prometheus/blob/main/CONTRIBUTING.md#dependency-management
+    policy-url: https://github.com/zzylol/prometheus/blob/main/CONTRIBUTING.md#dependency-management
 distribution-points:
-  - https://github.com/prometheus/prometheus/releases
+  - https://github.com/zzylol/prometheus/releases
 documentation:
   - https://prometheus.io/docs/introduction/overview/
 security-contacts:
@@ -45,4 +45,4 @@ security-testing:
       before-release: true
 vulnerability-reporting:
   accepts-vulnerability-reports: true
-  security-policy: https://github.com/prometheus/prometheus/security/policy
+  security-policy: https://github.com/zzylol/prometheus/security/policy

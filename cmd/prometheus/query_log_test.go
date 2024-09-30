@@ -32,7 +32,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/prometheus/prometheus/util/testutil"
+	"github.com/zzylol/prometheus/util/testutil"
 )
 
 type origin int

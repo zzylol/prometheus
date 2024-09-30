@@ -19,7 +19,7 @@ import (
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 
-	"github.com/prometheus/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/labels"
 )
 
 // Helper method to access labels under lock.

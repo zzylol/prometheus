@@ -25,7 +25,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/config"
 
-	"github.com/prometheus/prometheus/discovery/targetgroup"
+	"github.com/zzylol/prometheus/discovery/targetgroup"
 )
 
 type poolKey struct {
@@ -263,9 +263,9 @@ func (m *Manager) ApplyConfig(cfg map[string]Configs) error {
 	// Currently downstream managers expect full target state upon config reload, so we must oblige.
 	// While startProvider does pull the trigger, it may take some time to do so, therefore
 	// we pull the trigger as soon as possible so that downstream managers can populate their state.
-	// See https://github.com/prometheus/prometheus/pull/8639 for details.
+	// See https://github.com/zzylol/prometheus/pull/8639 for details.
 	// This also helps making the downstream managers drop stale targets as soon as possible.
-	// See https://github.com/prometheus/prometheus/pull/13147 for details.
+	// See https://github.com/zzylol/prometheus/pull/13147 for details.
 	if len(m.providers) > 0 {
 		select {
 		case m.triggerSend <- struct{}{}:
@@ -418,7 +418,7 @@ func (m *Manager) allGroups() map[string][]*targetgroup.Group {
 		p.mu.RLock()
 		for s := range p.subs {
 			// Send empty lists for subs without any targets to make sure old stale targets are dropped by consumers.
-			// See: https://github.com/prometheus/prometheus/issues/12858 for details.
+			// See: https://github.com/zzylol/prometheus/issues/12858 for details.
 			if _, ok := tSets[s]; !ok {
 				tSets[s] = []*targetgroup.Group{}
 				n[s] = 0

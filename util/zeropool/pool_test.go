@@ -21,7 +21,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/atomic"
 
-	"github.com/prometheus/prometheus/util/zeropool"
+	"github.com/zzylol/prometheus/util/zeropool"
 )
 
 func TestPool(t *testing.T) {

@@ -34,7 +34,7 @@ import (
 	"github.com/klauspost/compress/zstd"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/prometheus/prometheus/tsdb/fileutil"
+	"github.com/zzylol/prometheus/tsdb/fileutil"
 )
 
 const (

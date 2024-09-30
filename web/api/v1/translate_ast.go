@@ -16,8 +16,8 @@ package v1
 import (
 	"strconv"
 
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/promql/parser"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/promql/parser"
 )
 
 // Take a Go PromQL AST and translate it to an object that's nicely JSON-serializable

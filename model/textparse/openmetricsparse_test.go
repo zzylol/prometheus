@@ -21,8 +21,8 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
-	"github.com/prometheus/prometheus/model/exemplar"
-	"github.com/prometheus/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/exemplar"
+	"github.com/zzylol/prometheus/model/labels"
 )
 
 func int64p(x int64) *int64 { return &x }

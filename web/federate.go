@@ -28,15 +28,15 @@ import (
 	"github.com/prometheus/common/expfmt"
 	"github.com/prometheus/common/model"
 
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/timestamp"
-	"github.com/prometheus/prometheus/model/value"
-	"github.com/prometheus/prometheus/promql"
-	"github.com/prometheus/prometheus/promql/parser"
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/tsdb"
-	"github.com/prometheus/prometheus/tsdb/chunkenc"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/timestamp"
+	"github.com/zzylol/prometheus/model/value"
+	"github.com/zzylol/prometheus/promql"
+	"github.com/zzylol/prometheus/promql/parser"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/tsdb"
+	"github.com/zzylol/prometheus/tsdb/chunkenc"
 )
 
 var (

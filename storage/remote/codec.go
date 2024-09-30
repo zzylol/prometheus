@@ -29,14 +29,14 @@ import (
 	"github.com/prometheus/common/model"
 	"go.opentelemetry.io/collector/pdata/pmetric/pmetricotlp"
 
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/prompb"
-	writev2 "github.com/prometheus/prometheus/prompb/io/prometheus/write/v2"
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/tsdb/chunkenc"
-	"github.com/prometheus/prometheus/tsdb/chunks"
-	"github.com/prometheus/prometheus/util/annotations"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/prompb"
+	writev2 "github.com/zzylol/prometheus/prompb/io/prometheus/write/v2"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/tsdb/chunkenc"
+	"github.com/zzylol/prometheus/tsdb/chunks"
+	"github.com/zzylol/prometheus/util/annotations"
 )
 
 const (

@@ -38,18 +38,18 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/atomic"
 
-	"github.com/prometheus/prometheus/config"
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/relabel"
-	"github.com/prometheus/prometheus/model/timestamp"
-	"github.com/prometheus/prometheus/prompb"
-	writev2 "github.com/prometheus/prometheus/prompb/io/prometheus/write/v2"
-	"github.com/prometheus/prometheus/scrape"
-	"github.com/prometheus/prometheus/tsdb/chunks"
-	"github.com/prometheus/prometheus/tsdb/record"
-	"github.com/prometheus/prometheus/util/runutil"
-	"github.com/prometheus/prometheus/util/testutil"
+	"github.com/zzylol/prometheus/config"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/relabel"
+	"github.com/zzylol/prometheus/model/timestamp"
+	"github.com/zzylol/prometheus/prompb"
+	writev2 "github.com/zzylol/prometheus/prompb/io/prometheus/write/v2"
+	"github.com/zzylol/prometheus/scrape"
+	"github.com/zzylol/prometheus/tsdb/chunks"
+	"github.com/zzylol/prometheus/tsdb/record"
+	"github.com/zzylol/prometheus/util/runutil"
+	"github.com/zzylol/prometheus/util/testutil"
 )
 
 const defaultFlushDeadline = 1 * time.Minute
@@ -121,7 +121,7 @@ func TestBasicContentNegotiation(t *testing.T) {
 			name:           "v2 talks to (broken) v1 that tries to unmarshal v2 payload with v1 proto",
 			senderProtoMsg: config.RemoteWriteProtoMsgV2, receiverProtoMsg: config.RemoteWriteProtoMsgV1,
 			injectErrs: []error{nil},
-			expectFail: true, // We detect this thanks to https://github.com/prometheus/prometheus/issues/14359
+			expectFail: true, // We detect this thanks to https://github.com/zzylol/prometheus/issues/14359
 		},
 		// Opposite, v1 talking to v2 only server.
 		{

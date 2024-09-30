@@ -22,15 +22,15 @@ import (
 
 	"github.com/oklog/ulid"
 
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/tsdb/chunkenc"
-	"github.com/prometheus/prometheus/tsdb/chunks"
-	tsdb_errors "github.com/prometheus/prometheus/tsdb/errors"
-	"github.com/prometheus/prometheus/tsdb/index"
-	"github.com/prometheus/prometheus/tsdb/tombstones"
-	"github.com/prometheus/prometheus/util/annotations"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/tsdb/chunkenc"
+	"github.com/zzylol/prometheus/tsdb/chunks"
+	tsdb_errors "github.com/zzylol/prometheus/tsdb/errors"
+	"github.com/zzylol/prometheus/tsdb/index"
+	"github.com/zzylol/prometheus/tsdb/tombstones"
+	"github.com/zzylol/prometheus/util/annotations"
 )
 
 // checkContextEveryNIterations is used in some tight loops to check if the context is done.
@@ -306,8 +306,8 @@ func PostingsForMatchers(ctx context.Context, ix IndexReader, ms ...*labels.Matc
 		default: // l=""
 			// If the matchers for a labelname selects an empty value, it selects all
 			// the series which don't have the label name set too. See:
-			// https://github.com/prometheus/prometheus/issues/3575 and
-			// https://github.com/prometheus/prometheus/pull/3578#issuecomment-351653555
+			// https://github.com/zzylol/prometheus/issues/3575 and
+			// https://github.com/zzylol/prometheus/pull/3578#issuecomment-351653555
 			it, err := inversePostingsForMatcher(ctx, ix, m)
 			if err != nil {
 				return nil, err

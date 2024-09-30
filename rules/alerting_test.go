@@ -23,17 +23,17 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/relabel"
-	"github.com/prometheus/prometheus/model/timestamp"
-	"github.com/prometheus/prometheus/notifier"
-	"github.com/prometheus/prometheus/promql"
-	"github.com/prometheus/prometheus/promql/parser"
-	"github.com/prometheus/prometheus/promql/promqltest"
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/util/teststorage"
-	"github.com/prometheus/prometheus/util/testutil"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/relabel"
+	"github.com/zzylol/prometheus/model/timestamp"
+	"github.com/zzylol/prometheus/notifier"
+	"github.com/zzylol/prometheus/promql"
+	"github.com/zzylol/prometheus/promql/parser"
+	"github.com/zzylol/prometheus/promql/promqltest"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/util/teststorage"
+	"github.com/zzylol/prometheus/util/testutil"
 )
 
 func testEngine(tb testing.TB) *promql.Engine {
@@ -745,7 +745,7 @@ func TestQueryForStateSeries(t *testing.T) {
 	}
 }
 
-// TestSendAlertsDontAffectActiveAlerts tests a fix for https://github.com/prometheus/prometheus/issues/11424.
+// TestSendAlertsDontAffectActiveAlerts tests a fix for https://github.com/zzylol/prometheus/issues/11424.
 func TestSendAlertsDontAffectActiveAlerts(t *testing.T) {
 	rule := NewAlertingRule(
 		"TestRule",

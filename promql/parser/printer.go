@@ -21,7 +21,7 @@ import (
 
 	"github.com/prometheus/common/model"
 
-	"github.com/prometheus/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/labels"
 )
 
 // Tree returns a string of the tree structure of the given node.

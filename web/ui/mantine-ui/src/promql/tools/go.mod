@@ -1,10 +1,10 @@
-module github.com/prometheus/prometheus/web/ui/mantine-ui/src/promql/tools
+module github.com/zzylol/prometheus/web/ui/mantine-ui/src/promql/tools
 
 go 1.22.0
 
 require (
 	github.com/grafana/regexp v0.0.0-20240518133315-a468a5bfb3bc
-	github.com/prometheus/prometheus v0.54.1
+	github.com/zzylol/prometheus v0.54.1
 	github.com/russross/blackfriday/v2 v2.1.0
 )
 

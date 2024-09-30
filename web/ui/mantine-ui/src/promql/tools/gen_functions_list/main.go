@@ -18,7 +18,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/prometheus/prometheus/promql/parser"
+	"github.com/zzylol/prometheus/promql/parser"
 )
 
 func formatValueType(vt parser.ValueType) string {

@@ -16,7 +16,7 @@ package almost
 import (
 	"math"
 
-	"github.com/prometheus/prometheus/model/value"
+	"github.com/zzylol/prometheus/model/value"
 )
 
 var minNormal = math.Float64frombits(0x0010000000000000) // The smallest positive normal value of type float64.

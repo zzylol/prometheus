@@ -16,16 +16,16 @@ package tsdb
 import (
 	"testing"
 
-	"github.com/prometheus/prometheus/tsdb/tsdbutil"
+	"github.com/zzylol/prometheus/tsdb/tsdbutil"
 
 	prom_testutil "github.com/prometheus/client_golang/prometheus/testutil"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/tsdb/chunks"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/tsdb/chunks"
 )
 
 const (

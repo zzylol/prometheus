@@ -24,12 +24,12 @@ import (
 	config_util "github.com/prometheus/common/config"
 	"github.com/stretchr/testify/require"
 
-	"github.com/prometheus/prometheus/config"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/prompb"
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/util/annotations"
-	"github.com/prometheus/prometheus/util/testutil"
+	"github.com/zzylol/prometheus/config"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/prompb"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/util/annotations"
+	"github.com/zzylol/prometheus/util/testutil"
 )
 
 func TestNoDuplicateReadConfigs(t *testing.T) {

@@ -32,16 +32,16 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
 
-	"github.com/prometheus/prometheus/config"
-	"github.com/prometheus/prometheus/model/exemplar"
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/metadata"
-	"github.com/prometheus/prometheus/prompb"
-	writev2 "github.com/prometheus/prometheus/prompb/io/prometheus/write/v2"
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/tsdb"
-	"github.com/prometheus/prometheus/util/testutil"
+	"github.com/zzylol/prometheus/config"
+	"github.com/zzylol/prometheus/model/exemplar"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/metadata"
+	"github.com/zzylol/prometheus/prompb"
+	writev2 "github.com/zzylol/prometheus/prompb/io/prometheus/write/v2"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/tsdb"
+	"github.com/zzylol/prometheus/util/testutil"
 )
 
 func TestRemoteWriteHandlerHeadersHandling_V1Message(t *testing.T) {
@@ -918,7 +918,7 @@ func (m *mockAppendable) AppendHistogram(_ storage.SeriesRef, l labels.Labels, t
 func (m *mockAppendable) AppendHistogramCTZeroSample(ref storage.SeriesRef, l labels.Labels, t, ct int64, h *histogram.Histogram, fh *histogram.FloatHistogram) (storage.SeriesRef, error) {
 	// AppendCTZeroSample is no-op for remote-write for now.
 	// TODO(bwplotka/arthursens): Add support for PRW 2.0 for CT zero feature (but also we might
-	// replace this with in-metadata CT storage, see https://github.com/prometheus/prometheus/issues/14218).
+	// replace this with in-metadata CT storage, see https://github.com/zzylol/prometheus/issues/14218).
 	return 0, nil
 }
 
@@ -934,6 +934,6 @@ func (m *mockAppendable) UpdateMetadata(_ storage.SeriesRef, l labels.Labels, mp
 func (m *mockAppendable) AppendCTZeroSample(_ storage.SeriesRef, _ labels.Labels, _, _ int64) (storage.SeriesRef, error) {
 	// AppendCTZeroSample is no-op for remote-write for now.
 	// TODO(bwplotka): Add support for PRW 2.0 for CT zero feature (but also we might
-	// replace this with in-metadata CT storage, see https://github.com/prometheus/prometheus/issues/14218).
+	// replace this with in-metadata CT storage, see https://github.com/zzylol/prometheus/issues/14218).
 	return 0, nil
 }

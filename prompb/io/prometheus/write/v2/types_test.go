@@ -20,7 +20,7 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/require"
 
-	"github.com/prometheus/prometheus/prompb"
+	"github.com/zzylol/prometheus/prompb"
 )
 
 func TestInteropV2UnmarshalWithV1_DeterministicEmpty(t *testing.T) {

@@ -18,7 +18,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/prometheus/prometheus/model/value"
+	"github.com/zzylol/prometheus/model/value"
 )
 
 func TestEqual(t *testing.T) {

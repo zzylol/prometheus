@@ -35,9 +35,9 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/prometheus/prometheus/discovery"
-	"github.com/prometheus/prometheus/discovery/targetgroup"
-	"github.com/prometheus/prometheus/util/testutil"
+	"github.com/zzylol/prometheus/discovery"
+	"github.com/zzylol/prometheus/discovery/targetgroup"
+	"github.com/zzylol/prometheus/util/testutil"
 )
 
 func TestMain(m *testing.M) {

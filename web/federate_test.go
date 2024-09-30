@@ -30,16 +30,16 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
-	"github.com/prometheus/prometheus/config"
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/textparse"
-	"github.com/prometheus/prometheus/promql"
-	"github.com/prometheus/prometheus/promql/promqltest"
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/tsdb"
-	"github.com/prometheus/prometheus/util/teststorage"
-	"github.com/prometheus/prometheus/util/testutil"
+	"github.com/zzylol/prometheus/config"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/textparse"
+	"github.com/zzylol/prometheus/promql"
+	"github.com/zzylol/prometheus/promql/promqltest"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/tsdb"
+	"github.com/zzylol/prometheus/util/teststorage"
+	"github.com/zzylol/prometheus/util/testutil"
 )
 
 var scenarios = map[string]struct {
@@ -252,7 +252,7 @@ func (notReadyReadStorage) Stats(string, int) (*tsdb.Stats, error) {
 	return nil, fmt.Errorf("wrap: %w", tsdb.ErrNotReady)
 }
 
-// Regression test for https://github.com/prometheus/prometheus/issues/7181.
+// Regression test for https://github.com/zzylol/prometheus/issues/7181.
 func TestFederation_NotReady(t *testing.T) {
 	for name, scenario := range scenarios {
 		t.Run(name, func(t *testing.T) {

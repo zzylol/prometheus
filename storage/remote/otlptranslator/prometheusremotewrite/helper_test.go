@@ -27,7 +27,7 @@ import (
 
 	"github.com/prometheus/common/model"
 
-	"github.com/prometheus/prometheus/prompb"
+	"github.com/zzylol/prometheus/prompb"
 )
 
 func TestCreateAttributes(t *testing.T) {

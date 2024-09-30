@@ -35,15 +35,15 @@ import (
 	"github.com/go-kit/log"
 	"go.uber.org/atomic"
 
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/promql/parser"
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/tsdb"
-	"github.com/prometheus/prometheus/tsdb/chunkenc"
-	"github.com/prometheus/prometheus/tsdb/chunks"
-	tsdb_errors "github.com/prometheus/prometheus/tsdb/errors"
-	"github.com/prometheus/prometheus/tsdb/fileutil"
-	"github.com/prometheus/prometheus/tsdb/index"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/promql/parser"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/tsdb"
+	"github.com/zzylol/prometheus/tsdb/chunkenc"
+	"github.com/zzylol/prometheus/tsdb/chunks"
+	tsdb_errors "github.com/zzylol/prometheus/tsdb/errors"
+	"github.com/zzylol/prometheus/tsdb/fileutil"
+	"github.com/zzylol/prometheus/tsdb/index"
 )
 
 const timeDelta = 30000

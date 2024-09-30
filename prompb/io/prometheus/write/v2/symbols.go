@@ -13,7 +13,7 @@
 
 package writev2
 
-import "github.com/prometheus/prometheus/model/labels"
+import "github.com/zzylol/prometheus/model/labels"
 
 // SymbolsTable implements table for easy symbol use.
 type SymbolsTable struct {

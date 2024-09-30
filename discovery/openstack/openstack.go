@@ -28,9 +28,9 @@ import (
 	"github.com/prometheus/common/config"
 	"github.com/prometheus/common/model"
 
-	"github.com/prometheus/prometheus/discovery"
-	"github.com/prometheus/prometheus/discovery/refresh"
-	"github.com/prometheus/prometheus/discovery/targetgroup"
+	"github.com/zzylol/prometheus/discovery"
+	"github.com/zzylol/prometheus/discovery/refresh"
+	"github.com/zzylol/prometheus/discovery/targetgroup"
 )
 
 // DefaultSDConfig is the default OpenStack SD configuration.

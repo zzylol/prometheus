@@ -24,9 +24,9 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/prometheus/prometheus/tsdb/chunkenc"
-	tsdb_errors "github.com/prometheus/prometheus/tsdb/errors"
-	"github.com/prometheus/prometheus/tsdb/fileutil"
+	"github.com/zzylol/prometheus/tsdb/chunkenc"
+	tsdb_errors "github.com/zzylol/prometheus/tsdb/errors"
+	"github.com/zzylol/prometheus/tsdb/fileutil"
 )
 
 // Segment header fields constants.

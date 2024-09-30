@@ -35,12 +35,12 @@ import (
 	"go.uber.org/atomic"
 	"gopkg.in/yaml.v2"
 
-	"github.com/prometheus/prometheus/discovery"
+	"github.com/zzylol/prometheus/discovery"
 
-	"github.com/prometheus/prometheus/config"
-	"github.com/prometheus/prometheus/discovery/targetgroup"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/relabel"
+	"github.com/zzylol/prometheus/config"
+	"github.com/zzylol/prometheus/discovery/targetgroup"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/relabel"
 )
 
 func TestPostPath(t *testing.T) {
@@ -702,8 +702,8 @@ func TestLabelsToOpenAPILabelSet(t *testing.T) {
 }
 
 // TestHangingNotifier ensures that the notifier takes into account SD changes even when there are
-// queued alerts. This test reproduces the issue described in https://github.com/prometheus/prometheus/issues/13676.
-// and https://github.com/prometheus/prometheus/issues/8768.
+// queued alerts. This test reproduces the issue described in https://github.com/zzylol/prometheus/issues/13676.
+// and https://github.com/zzylol/prometheus/issues/8768.
 func TestHangingNotifier(t *testing.T) {
 	const (
 		batches     = 100

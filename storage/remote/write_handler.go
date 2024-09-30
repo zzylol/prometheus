@@ -30,15 +30,15 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/common/model"
 
-	"github.com/prometheus/prometheus/config"
-	"github.com/prometheus/prometheus/model/exemplar"
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/timestamp"
-	"github.com/prometheus/prometheus/prompb"
-	writev2 "github.com/prometheus/prometheus/prompb/io/prometheus/write/v2"
-	"github.com/prometheus/prometheus/storage"
-	otlptranslator "github.com/prometheus/prometheus/storage/remote/otlptranslator/prometheusremotewrite"
+	"github.com/zzylol/prometheus/config"
+	"github.com/zzylol/prometheus/model/exemplar"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/timestamp"
+	"github.com/zzylol/prometheus/prompb"
+	writev2 "github.com/zzylol/prometheus/prompb/io/prometheus/write/v2"
+	"github.com/zzylol/prometheus/storage"
+	otlptranslator "github.com/zzylol/prometheus/storage/remote/otlptranslator/prometheusremotewrite"
 )
 
 type writeHandler struct {
@@ -112,7 +112,7 @@ func (h *writeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	contentType := r.Header.Get("Content-Type")
 	if contentType == "" {
 		// Don't break yolo 1.0 clients if not needed. This is similar to what we did
-		// before 2.0: https://github.com/prometheus/prometheus/blob/d78253319daa62c8f28ed47e40bafcad2dd8b586/storage/remote/write_handler.go#L62
+		// before 2.0: https://github.com/zzylol/prometheus/blob/d78253319daa62c8f28ed47e40bafcad2dd8b586/storage/remote/write_handler.go#L62
 		// We could give http.StatusUnsupportedMediaType, but let's assume 1.0 message by default.
 		contentType = appProtoContentType
 	}
@@ -138,7 +138,7 @@ func (h *writeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	enc := r.Header.Get("Content-Encoding")
 	if enc == "" {
 		// Don't break yolo 1.0 clients if not needed. This is similar to what we did
-		// before 2.0: https://github.com/prometheus/prometheus/blob/d78253319daa62c8f28ed47e40bafcad2dd8b586/storage/remote/write_handler.go#L62
+		// before 2.0: https://github.com/zzylol/prometheus/blob/d78253319daa62c8f28ed47e40bafcad2dd8b586/storage/remote/write_handler.go#L62
 		// We could give http.StatusUnsupportedMediaType, but let's assume snappy by default.
 	} else if enc != string(SnappyBlockCompression) {
 		err := fmt.Errorf("%v encoding (compression) is not accepted by this server; only %v is acceptable", enc, SnappyBlockCompression)

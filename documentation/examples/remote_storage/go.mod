@@ -1,4 +1,4 @@
-module github.com/prometheus/prometheus/documentation/examples/remote_storage
+module github.com/zzylol/prometheus/documentation/examples/remote_storage
 
 go 1.22.0
 
@@ -10,7 +10,7 @@ require (
 	github.com/influxdata/influxdb v1.11.6
 	github.com/prometheus/client_golang v1.20.2
 	github.com/prometheus/common v0.57.0
-	github.com/prometheus/prometheus v0.53.1
+	github.com/zzylol/prometheus v0.53.1
 	github.com/stretchr/testify v1.9.0
 )
 
@@ -85,4 +85,4 @@ exclude (
 )
 
 // TODO(bwplotka): Move to main branch commit or perhaps released version.
-replace github.com/prometheus/prometheus => github.com/prometheus/prometheus v0.53.1-0.20240704074759-c137febfcf8c
+replace github.com/zzylol/prometheus => github.com/zzylol/prometheus v0.53.1-0.20240704074759-c137febfcf8c

@@ -3,7 +3,7 @@ go:
     # .github/workflows should also be updated.
     version: 1.23
 repository:
-    path: github.com/prometheus/prometheus
+    path: github.com/zzylol/prometheus
 build:
     binaries:
         - name: prometheus

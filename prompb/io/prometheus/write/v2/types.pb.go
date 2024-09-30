@@ -107,7 +107,7 @@ func (Histogram_ResetHint) EnumDescriptor() ([]byte, []int) {
 //
 // NOTE: gogoproto options might change in future for this file, they
 // are not part of the spec proto (they only modify the generated Go code, not
-// the serialized message). See: https://github.com/prometheus/prometheus/issues/11908
+// the serialized message). See: https://github.com/zzylol/prometheus/issues/11908
 type Request struct {
 	// symbols contains a de-duplicated array of string elements used for various
 	// items in a Request message, like labels and metadata items. For the sender's convenience
@@ -202,7 +202,7 @@ type TimeSeries struct {
 	// Note that some receivers might require this and in return fail to
 	// ingest such samples within the Request.
 	//
-	// For Go, see github.com/prometheus/prometheus/model/timestamp/timestamp.go
+	// For Go, see github.com/zzylol/prometheus/model/timestamp/timestamp.go
 	// for conversion from/to time.Time to Prometheus timestamp.
 	//
 	// Note that the "optional" keyword is omitted due to
@@ -304,7 +304,7 @@ type Exemplar struct {
 	Value float64 `protobuf:"fixed64,2,opt,name=value,proto3" json:"value,omitempty"`
 	// timestamp represents the timestamp of the exemplar in ms.
 	//
-	// For Go, see github.com/prometheus/prometheus/model/timestamp/timestamp.go
+	// For Go, see github.com/zzylol/prometheus/model/timestamp/timestamp.go
 	// for conversion from/to time.Time to Prometheus timestamp.
 	Timestamp            int64    `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -372,7 +372,7 @@ type Sample struct {
 	Value float64 `protobuf:"fixed64,1,opt,name=value,proto3" json:"value,omitempty"`
 	// timestamp represents timestamp of the sample in ms.
 	//
-	// For Go, see github.com/prometheus/prometheus/model/timestamp/timestamp.go
+	// For Go, see github.com/zzylol/prometheus/model/timestamp/timestamp.go
 	// for conversion from/to time.Time to Prometheus timestamp.
 	Timestamp            int64    `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -550,7 +550,7 @@ type Histogram struct {
 	ResetHint      Histogram_ResetHint `protobuf:"varint,14,opt,name=reset_hint,json=resetHint,proto3,enum=io.prometheus.write.v2.Histogram_ResetHint" json:"reset_hint,omitempty"`
 	// timestamp represents timestamp of the sample in ms.
 	//
-	// For Go, see github.com/prometheus/prometheus/model/timestamp/timestamp.go
+	// For Go, see github.com/zzylol/prometheus/model/timestamp/timestamp.go
 	// for conversion from/to time.Time to Prometheus timestamp.
 	Timestamp int64 `protobuf:"varint,15,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	// custom_values is an additional field used by non-exponential bucketing layouts.

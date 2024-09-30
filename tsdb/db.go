@@ -36,16 +36,16 @@ import (
 	"go.uber.org/atomic"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/prometheus/prometheus/config"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/tsdb/chunkenc"
-	"github.com/prometheus/prometheus/tsdb/chunks"
-	tsdb_errors "github.com/prometheus/prometheus/tsdb/errors"
-	"github.com/prometheus/prometheus/tsdb/fileutil"
-	_ "github.com/prometheus/prometheus/tsdb/goversion" // Load the package into main to make sure minimum Go version is met.
-	"github.com/prometheus/prometheus/tsdb/tsdbutil"
-	"github.com/prometheus/prometheus/tsdb/wlog"
+	"github.com/zzylol/prometheus/config"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/tsdb/chunkenc"
+	"github.com/zzylol/prometheus/tsdb/chunks"
+	tsdb_errors "github.com/zzylol/prometheus/tsdb/errors"
+	"github.com/zzylol/prometheus/tsdb/fileutil"
+	_ "github.com/zzylol/prometheus/tsdb/goversion" // Load the package into main to make sure minimum Go version is met.
+	"github.com/zzylol/prometheus/tsdb/tsdbutil"
+	"github.com/zzylol/prometheus/tsdb/wlog"
 )
 
 const (
@@ -540,7 +540,7 @@ func (db *DBReadOnly) loadDataAsQueryable(maxt int64) (storage.SampleAndChunkQue
 	opts := DefaultHeadOptions()
 	// Hard link the chunk files to a dir in db.sandboxDir in case the Head needs to truncate some of them
 	// or cut new ones while replaying the WAL.
-	// See https://github.com/prometheus/prometheus/issues/11618.
+	// See https://github.com/zzylol/prometheus/issues/11618.
 	err = chunks.HardLinkChunkFiles(mmappedChunksDir(db.dir), mmappedChunksDir(db.sandboxDir))
 	if err != nil {
 		return nil, err

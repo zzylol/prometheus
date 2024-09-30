@@ -13,7 +13,7 @@
 
 package exemplar
 
-import "github.com/prometheus/prometheus/model/labels"
+import "github.com/zzylol/prometheus/model/labels"
 
 // ExemplarMaxLabelSetLength is defined by OpenMetrics: "The combined length of
 // the label names and values of an Exemplar's LabelSet MUST NOT exceed 128

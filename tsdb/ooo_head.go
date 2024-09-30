@@ -16,8 +16,8 @@ package tsdb
 import (
 	"sort"
 
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/tsdb/chunkenc"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/tsdb/chunkenc"
 )
 
 // OOOChunk maintains samples in time-ascending order.

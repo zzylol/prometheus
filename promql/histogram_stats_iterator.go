@@ -14,9 +14,9 @@
 package promql
 
 import (
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/value"
-	"github.com/prometheus/prometheus/tsdb/chunkenc"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/value"
+	"github.com/zzylol/prometheus/tsdb/chunkenc"
 )
 
 type histogramStatsIterator struct {

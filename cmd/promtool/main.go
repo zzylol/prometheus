@@ -47,19 +47,19 @@ import (
 	promconfig "github.com/prometheus/common/config"
 	"github.com/prometheus/common/expfmt"
 
-	"github.com/prometheus/prometheus/config"
-	"github.com/prometheus/prometheus/discovery"
-	"github.com/prometheus/prometheus/discovery/file"
-	"github.com/prometheus/prometheus/discovery/kubernetes"
-	"github.com/prometheus/prometheus/discovery/targetgroup"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/rulefmt"
-	"github.com/prometheus/prometheus/notifier"
-	_ "github.com/prometheus/prometheus/plugins" // Register plugins.
-	"github.com/prometheus/prometheus/promql/parser"
-	"github.com/prometheus/prometheus/promql/promqltest"
-	"github.com/prometheus/prometheus/scrape"
-	"github.com/prometheus/prometheus/util/documentcli"
+	"github.com/zzylol/prometheus/config"
+	"github.com/zzylol/prometheus/discovery"
+	"github.com/zzylol/prometheus/discovery/file"
+	"github.com/zzylol/prometheus/discovery/kubernetes"
+	"github.com/zzylol/prometheus/discovery/targetgroup"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/rulefmt"
+	"github.com/zzylol/prometheus/notifier"
+	_ "github.com/zzylol/prometheus/plugins" // Register plugins.
+	"github.com/zzylol/prometheus/promql/parser"
+	"github.com/zzylol/prometheus/promql/promqltest"
+	"github.com/zzylol/prometheus/scrape"
+	"github.com/zzylol/prometheus/util/documentcli"
 )
 
 func init() {

@@ -36,23 +36,23 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/common/version"
 
-	"github.com/prometheus/prometheus/config"
-	"github.com/prometheus/prometheus/discovery/targetgroup"
-	"github.com/prometheus/prometheus/model/exemplar"
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/metadata"
-	"github.com/prometheus/prometheus/model/relabel"
-	"github.com/prometheus/prometheus/model/textparse"
-	"github.com/prometheus/prometheus/model/timestamp"
-	"github.com/prometheus/prometheus/model/value"
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/util/pool"
+	"github.com/zzylol/prometheus/config"
+	"github.com/zzylol/prometheus/discovery/targetgroup"
+	"github.com/zzylol/prometheus/model/exemplar"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/metadata"
+	"github.com/zzylol/prometheus/model/relabel"
+	"github.com/zzylol/prometheus/model/textparse"
+	"github.com/zzylol/prometheus/model/timestamp"
+	"github.com/zzylol/prometheus/model/value"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/util/pool"
 )
 
 // ScrapeTimestampTolerance is the tolerance for scrape appends timestamps
 // alignment, to enable better compression at the TSDB level.
-// See https://github.com/prometheus/prometheus/issues/7846
+// See https://github.com/zzylol/prometheus/issues/7846
 var ScrapeTimestampTolerance = 2 * time.Millisecond
 
 // AlignScrapeTimestamps enables the tolerance for scrape appends timestamps described above.
@@ -1209,7 +1209,7 @@ func newScrapeLoop(ctx context.Context,
 		// Store the cache and target in the context. This is then used by downstream OTel Collector
 		// to lookup the metadata required to process the samples. Not used by Prometheus itself.
 		// TODO(gouthamve) We're using a dedicated context because using the parentCtx caused a memory
-		// leak. We should ideally fix the main leak. See: https://github.com/prometheus/prometheus/pull/10590
+		// leak. We should ideally fix the main leak. See: https://github.com/zzylol/prometheus/pull/10590
 		appenderCtx = ContextWithMetricMetadataStore(appenderCtx, cache)
 		appenderCtx = ContextWithTarget(appenderCtx, target)
 	}
@@ -1289,7 +1289,7 @@ mainLoop:
 
 		// Temporary workaround for a jitter in go timers that causes disk space
 		// increase in TSDB.
-		// See https://github.com/prometheus/prometheus/issues/7846
+		// See https://github.com/zzylol/prometheus/issues/7846
 		// Calling Round ensures the time used is the wall clock, as otherwise .Sub
 		// and .Add on time.Time behave differently (see time package docs).
 		scrapeTime := time.Now().Round(0)

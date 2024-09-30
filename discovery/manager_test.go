@@ -28,8 +28,8 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
-	"github.com/prometheus/prometheus/discovery/targetgroup"
-	"github.com/prometheus/prometheus/util/testutil"
+	"github.com/zzylol/prometheus/discovery/targetgroup"
+	"github.com/zzylol/prometheus/util/testutil"
 )
 
 func TestMain(m *testing.M) {
@@ -1089,7 +1089,7 @@ func TestTargetSetRecreatesEmptyStaticConfigs(t *testing.T) {
 	p = pk("static", "prometheus", 1)
 	targetGroups, ok := discoveryManager.targets[p]
 	require.True(t, ok, "'%v' should be present in targets", p)
-	// Otherwise the targetGroups will leak, see https://github.com/prometheus/prometheus/issues/12436.
+	// Otherwise the targetGroups will leak, see https://github.com/zzylol/prometheus/issues/12436.
 	require.Empty(t, targetGroups, 0, "'%v' should no longer have any associated target groups", p)
 	require.Len(t, syncedTargets, 1, "an update with no targetGroups should still be sent.")
 	require.Empty(t, syncedTargets["prometheus"], 0)

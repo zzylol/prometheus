@@ -33,8 +33,8 @@ import (
 
 	common_templates "github.com/prometheus/common/helpers/templates"
 
-	"github.com/prometheus/prometheus/promql"
-	"github.com/prometheus/prometheus/util/strutil"
+	"github.com/zzylol/prometheus/promql"
+	"github.com/zzylol/prometheus/util/strutil"
 )
 
 var (

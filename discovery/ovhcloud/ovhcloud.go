@@ -26,9 +26,9 @@ import (
 	"github.com/prometheus/common/config"
 	"github.com/prometheus/common/model"
 
-	"github.com/prometheus/prometheus/discovery"
-	"github.com/prometheus/prometheus/discovery/refresh"
-	"github.com/prometheus/prometheus/discovery/targetgroup"
+	"github.com/zzylol/prometheus/discovery"
+	"github.com/zzylol/prometheus/discovery/refresh"
+	"github.com/zzylol/prometheus/discovery/targetgroup"
 )
 
 // metaLabelPrefix is the meta prefix used for all meta labels in this discovery.

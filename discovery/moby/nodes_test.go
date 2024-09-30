@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
 
-	"github.com/prometheus/prometheus/discovery"
+	"github.com/zzylol/prometheus/discovery"
 )
 
 func TestDockerSwarmNodesSDRefresh(t *testing.T) {

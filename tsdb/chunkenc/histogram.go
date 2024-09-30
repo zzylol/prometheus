@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/value"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/value"
 )
 
 // HistogramChunk holds encoded sample data for a sparse, high-resolution

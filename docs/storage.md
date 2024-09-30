@@ -159,8 +159,8 @@ Prometheus integrates with remote storage systems in four ways:
 
 - Prometheus can write samples that it ingests to a remote URL in a [Remote Write format](https://prometheus.io/docs/specs/remote_write_spec_2_0/).
 - Prometheus can receive samples from other clients in a [Remote Write format](https://prometheus.io/docs/specs/remote_write_spec_2_0/).
-- Prometheus can read (back) sample data from a remote URL in a [Remote Read format](https://github.com/prometheus/prometheus/blob/main/prompb/remote.proto#L31).
-- Prometheus can return sample data requested by clients in a [Remote Read format](https://github.com/prometheus/prometheus/blob/main/prompb/remote.proto#L31).
+- Prometheus can read (back) sample data from a remote URL in a [Remote Read format](https://github.com/zzylol/prometheus/blob/main/prompb/remote.proto#L31).
+- Prometheus can return sample data requested by clients in a [Remote Read format](https://github.com/zzylol/prometheus/blob/main/prompb/remote.proto#L31).
 
 ![Remote read and write architecture](images/remote_integrations.png)
 

@@ -20,7 +20,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
 
-	"github.com/prometheus/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/labels"
 )
 
 // RequireEqual is a replacement for require.Equal using go-cmp adapted for

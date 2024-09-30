@@ -29,9 +29,9 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
-	"github.com/prometheus/prometheus/config"
-	"github.com/prometheus/prometheus/prompb"
-	"github.com/prometheus/prometheus/tsdb/chunkenc"
+	"github.com/zzylol/prometheus/config"
+	"github.com/zzylol/prometheus/prompb"
+	"github.com/zzylol/prometheus/tsdb/chunkenc"
 )
 
 var longErrMessage = strings.Repeat("error message", maxErrMsgLen)

@@ -28,8 +28,8 @@ import (
 	"github.com/bboreham/go-loser"
 	"github.com/cespare/xxhash/v2"
 
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/storage"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/storage"
 )
 
 var allPostingsKey = labels.Label{}

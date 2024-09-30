@@ -18,7 +18,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/prometheus/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/labels"
 )
 
 func TestSymbolsTable(t *testing.T) {

@@ -18,10 +18,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/prompb"
-	writev2 "github.com/prometheus/prometheus/prompb/io/prometheus/write/v2"
-	"github.com/prometheus/prometheus/storage/remote"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/prompb"
+	writev2 "github.com/zzylol/prometheus/prompb/io/prometheus/write/v2"
+	"github.com/zzylol/prometheus/storage/remote"
 )
 
 func main() {

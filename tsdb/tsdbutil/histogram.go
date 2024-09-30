@@ -16,7 +16,7 @@ package tsdbutil
 import (
 	"math"
 
-	"github.com/prometheus/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/histogram"
 )
 
 func GenerateTestHistograms(n int) (r []*histogram.Histogram) {

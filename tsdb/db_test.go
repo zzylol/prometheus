@@ -40,21 +40,21 @@ import (
 	"go.uber.org/atomic"
 	"go.uber.org/goleak"
 
-	"github.com/prometheus/prometheus/config"
-	"github.com/prometheus/prometheus/model/histogram"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/metadata"
-	"github.com/prometheus/prometheus/storage"
-	"github.com/prometheus/prometheus/tsdb/chunkenc"
-	"github.com/prometheus/prometheus/tsdb/chunks"
-	"github.com/prometheus/prometheus/tsdb/fileutil"
-	"github.com/prometheus/prometheus/tsdb/index"
-	"github.com/prometheus/prometheus/tsdb/record"
-	"github.com/prometheus/prometheus/tsdb/tombstones"
-	"github.com/prometheus/prometheus/tsdb/tsdbutil"
-	"github.com/prometheus/prometheus/tsdb/wlog"
-	"github.com/prometheus/prometheus/util/annotations"
-	"github.com/prometheus/prometheus/util/testutil"
+	"github.com/zzylol/prometheus/config"
+	"github.com/zzylol/prometheus/model/histogram"
+	"github.com/zzylol/prometheus/model/labels"
+	"github.com/zzylol/prometheus/model/metadata"
+	"github.com/zzylol/prometheus/storage"
+	"github.com/zzylol/prometheus/tsdb/chunkenc"
+	"github.com/zzylol/prometheus/tsdb/chunks"
+	"github.com/zzylol/prometheus/tsdb/fileutil"
+	"github.com/zzylol/prometheus/tsdb/index"
+	"github.com/zzylol/prometheus/tsdb/record"
+	"github.com/zzylol/prometheus/tsdb/tombstones"
+	"github.com/zzylol/prometheus/tsdb/tsdbutil"
+	"github.com/zzylol/prometheus/tsdb/wlog"
+	"github.com/zzylol/prometheus/util/annotations"
+	"github.com/zzylol/prometheus/util/testutil"
 )
 
 func TestMain(m *testing.M) {
@@ -64,8 +64,8 @@ func TestMain(m *testing.M) {
 	defaultIsolationDisabled = !isolationEnabled
 
 	goleak.VerifyTestMain(m,
-		goleak.IgnoreTopFunction("github.com/prometheus/prometheus/tsdb.(*SegmentWAL).cut.func1"),
-		goleak.IgnoreTopFunction("github.com/prometheus/prometheus/tsdb.(*SegmentWAL).cut.func2"),
+		goleak.IgnoreTopFunction("github.com/zzylol/prometheus/tsdb.(*SegmentWAL).cut.func1"),
+		goleak.IgnoreTopFunction("github.com/zzylol/prometheus/tsdb.(*SegmentWAL).cut.func2"),
 		goleak.IgnoreTopFunction("go.opencensus.io/stats/view.(*worker).start"))
 }
 
@@ -227,7 +227,7 @@ func TestDataAvailableOnlyAfterCommit(t *testing.T) {
 }
 
 // TestNoPanicAfterWALCorruption ensures that querying the db after a WAL corruption doesn't cause a panic.
-// https://github.com/prometheus/prometheus/issues/7548
+// https://github.com/zzylol/prometheus/issues/7548
 func TestNoPanicAfterWALCorruption(t *testing.T) {
 	db := openTestDB(t, &Options{WALSegmentSize: 32 * 1024}, nil)
 
@@ -673,7 +673,7 @@ func TestDB_Snapshot(t *testing.T) {
 
 // TestDB_Snapshot_ChunksOutsideOfCompactedRange ensures that a snapshot removes chunks samples
 // that are outside the set block time range.
-// See https://github.com/prometheus/prometheus/issues/5105
+// See https://github.com/zzylol/prometheus/issues/5105
 func TestDB_Snapshot_ChunksOutsideOfCompactedRange(t *testing.T) {
 	db := openTestDB(t, nil, nil)
 
@@ -1071,8 +1071,8 @@ func TestWALSegmentSizeOptions(t *testing.T) {
 	}
 }
 
-// https://github.com/prometheus/prometheus/issues/9846
-// https://github.com/prometheus/prometheus/issues/9859
+// https://github.com/zzylol/prometheus/issues/9846
+// https://github.com/zzylol/prometheus/issues/9859
 func TestWALReplayRaceOnSamplesLoggedBeforeSeries(t *testing.T) {
 	const (
 		numRuns                        = 1
@@ -3042,7 +3042,7 @@ func TestRangeForTimestamp(t *testing.T) {
 }
 
 // TestChunkReader_ConcurrentReads checks that the chunk result can be read concurrently.
-// Regression test for https://github.com/prometheus/prometheus/pull/6514.
+// Regression test for https://github.com/zzylol/prometheus/pull/6514.
 func TestChunkReader_ConcurrentReads(t *testing.T) {
 	chks := []chunks.Meta{
 		assureChunkFromSamples(t, []chunks.Sample{sample{1, 1, nil, nil}}),
@@ -3147,7 +3147,7 @@ func TestCompactHead(t *testing.T) {
 	require.NoError(t, seriesSet.Err())
 }
 
-// TestCompactHeadWithDeletion tests https://github.com/prometheus/prometheus/issues/11585.
+// TestCompactHeadWithDeletion tests https://github.com/zzylol/prometheus/issues/11585.
 func TestCompactHeadWithDeletion(t *testing.T) {
 	db, err := Open(t.TempDir(), log.NewNopLogger(), prometheus.NewRegistry(), nil, nil)
 	require.NoError(t, err)
@@ -4388,7 +4388,7 @@ func testOOOWALWrite(t *testing.T,
 	require.Equal(t, expectedOOORecords, actRecs)
 }
 
-// Tests https://github.com/prometheus/prometheus/issues/10291#issuecomment-1044373110.
+// Tests https://github.com/zzylol/prometheus/issues/10291#issuecomment-1044373110.
 func TestDBPanicOnMmappingHeadChunk(t *testing.T) {
 	dir := t.TempDir()
 	ctx := context.Background()
@@ -8684,7 +8684,7 @@ func (c *mockCompactorFn) Write(_ string, _ BlockReader, _, _ int64, _ *BlockMet
 	return c.writeFn()
 }
 
-// Regression test for https://github.com/prometheus/prometheus/pull/13754
+// Regression test for https://github.com/zzylol/prometheus/pull/13754
 func TestAbortBlockCompactions(t *testing.T) {
 	// Create a test DB
 	db := openTestDB(t, nil, nil)

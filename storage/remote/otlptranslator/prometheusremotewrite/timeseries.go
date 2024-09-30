@@ -18,7 +18,7 @@
 package prometheusremotewrite
 
 import (
-	"github.com/prometheus/prometheus/prompb"
+	"github.com/zzylol/prometheus/prompb"
 )
 
 // TimeSeries returns a slice of the prompb.TimeSeries that were converted from OTel format.
