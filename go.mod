@@ -18,7 +18,7 @@ require (
 	github.com/digitalocean/godo v1.126.0
 	github.com/docker/docker v27.3.1+incompatible
 	github.com/edsrzf/mmap-go v1.1.0
-	github.com/envoyproxy/go-control-plane v0.13.0
+	github.com/envoyproxy/go-control-plane v0.13.1
 	github.com/envoyproxy/protoc-gen-validate v1.1.0
 	github.com/facette/natsort v0.0.0-20181210072756-2cd4dd1e2dcb
 	github.com/froot-netsys/promsketch v0.0.0-20240930052445-4662df79c5e8
