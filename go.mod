@@ -1,6 +1,7 @@
 module github.com/zzylol/prometheus
 
 go 1.22.5
+toolchain go1.22.9
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.14.0
@@ -82,7 +83,7 @@ require (
 	golang.org/x/tools v0.25.0
 	google.golang.org/api v0.199.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240930140551-af27646dc61f
-	google.golang.org/grpc v1.67.0
+	google.golang.org/grpc v1.68.0
 	google.golang.org/protobuf v1.34.2
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -115,7 +116,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cilium/ebpf v0.11.0 // indirect
-	github.com/cncf/xds/go v0.0.0-20240723142845-024c85f92f20 // indirect
+	github.com/cncf/xds/go v0.0.0-20240905190251-b4127c9b8d78 // indirect
 	github.com/containerd/cgroups/v3 v3.0.3 // indirect
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
