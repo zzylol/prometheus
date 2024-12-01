@@ -22,7 +22,7 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v1.1.0
 	github.com/facette/natsort v0.0.0-20181210072756-2cd4dd1e2dcb
 	github.com/froot-netsys/promsketch v0.0.0-20240930052445-4662df79c5e8
-	github.com/fsnotify/fsnotify v1.7.0
+	github.com/fsnotify/fsnotify v1.8.0
 	github.com/go-kit/log v0.2.1
 	github.com/go-logfmt/logfmt v0.6.0
 	github.com/go-openapi/strfmt v0.23.0
